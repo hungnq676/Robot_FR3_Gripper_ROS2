@@ -1,0 +1,15 @@
+import fs from 'node:fs/promises';import {FileBlob,PresentationFile} from '@oai/artifact-tool';
+const root='/home/duong-12a/fr3_hungros2/slides';const p=await PresentationFile.importPptx(await FileBlob.load(root+'/output/FR3_slide_01_10_v11.pptx'));const s=p.slides.items[7];
+for(const q of s.shapes.items){if(q.position.top>=226&&q.position.top<674){q.text='';q.fill='none';}}
+function tx(t,x,y,w,h,size=24,color='#252525',bold=false){let q=s.shapes.add({geometry:'textbox',position:{left:x,top:y,width:w,height:h},fill:'none',line:{fill:'none',width:0}});q.text=t;q.text.style={typeface:'DejaVu Sans',fontSize:size,bold,color};}
+async function image(file,x,y,w,h){const b=await fs.readFile(file);s.images.add({blob:b.buffer.slice(b.byteOffset,b.byteOffset+b.byteLength),contentType:file.endsWith('.png')?'image/png':'image/jpeg',alt:file,fit:'contain',position:{left:x,top:y,width:w,height:h}});}
+tx('Từ vùng Gemini chỉ định đến mặt nạ các pixel thuộc vật',64,229,1152,43,25,'#555555');
+const raw='/home/duong-12a/fr3_hungros2/nhat_ky/du_lieu/2026-11-02_021605_hop_gia_trang/camera_mau_dau.jpg';
+for(const [i,t] of ['1. Ảnh camera','2. Khung bao Gemini','3. Mặt nạ MobileSAM'].entries())tx(t,64+i*400,282,352,39,23,'#B5121B',true);
+await image(raw,64,331,352,264);await image(raw,464,331,352,264);await image(root+'/assets/mobilesam_replay_mask.png',864,331,352,264);
+s.shapes.add({geometry:'rect',position:{left:464+344*0.55,top:331+85*0.55,width:95*0.55,height:128*0.55},fill:'none',line:{fill:'#B5121B',width:2.5}});
+tx('→',423,442,40,44,29,'#B5121B',true);tx('→',823,442,40,44,29,'#B5121B',true);
+tx('Ảnh đầu vào chứa vật và nền',64,600,352,49,20,'#555555');tx('Khung bao chỉ vùng giá trắng cần tách',464,600,352,49,20,'#555555');tx('Trắng: pixel vật; đen: nền',864,600,352,49,20,'#555555');
+tx('MobileSAM kết hợp đặc trưng ảnh và gợi ý khung bao để dự đoán mặt nạ vật.',64,649,1152,25,17,'#B5121B');
+s.speakerNotes.text='Chuỗi minh họa dùng ảnh thật đã lưu trong nhat_ky/du_lieu/2026-11-02_021605_hop_gia_trang/camera_mau_dau.jpg. Khung bao [344,85,439,213] lấy từ vat.yaml cùng phiên, là dữ liệu Gemini đã lưu, không gọi lại Gemini. MobileSAM được chạy lại trên ảnh lưu và khung bao này bằng trọng số /home/duong-12a/graspnet_runtime/mobile_sam.pt trên CPU; mask có5192 pixel,480x640, lưu slides/assets/mobilesam_replay_mask.npy/.png. Đây là chạy lại xử lý trên dữ liệu phiên cũ, không phải chụp thêm lần robot mới. Ảnh thứ2 là ảnh nguồn có hình chữ nhật native PowerPoint hiển thị tọa độ đã lưu; ảnh3 là đầu ra nhị phân thực của MobileSAM. Nguyên lý: TinyViT trích đặc trưng ảnh, prompt encoder xử lý box, mask decoder kết hợp để dự đoán pixel vật. Mặt nạ không tự có độ sâu hoặc kích thước3D. Nguồn phương pháp: https://github.com/ChaoningZhang/MobileSAM ; tools/grasp_once.py:199–210. Logo PTIT chính thức.';
+await(await PresentationFile.exportPptx(p)).save(root+'/.build/slide-1-10-v12.pptx');await fs.writeFile(root+'/output/FR3_slide_08_v12.png',new Uint8Array(await(await p.export({slide:s,format:'png',scale:1})).arrayBuffer()));console.log('done');

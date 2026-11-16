@@ -1,0 +1,103 @@
+Panels: []
+Visualization Manager:
+  Class: ''
+  Displays:
+  - Alpha: 0.5
+    Cell Size: 1
+    Class: rviz_default_plugins/Grid
+    Color: 160; 160; 164
+    Enabled: true
+    Line Style:
+      Line Width: 0.029999999329447746
+      Value: Lines
+    Name: Grid
+    Normal Cell Count: 0
+    Offset:
+      X: 0
+      Y: 0
+      Z: 0
+    Plane: XY
+    Plane Cell Count: 10
+    Reference Frame: <Fixed Frame>
+    Value: true
+  - Class: rviz_default_plugins/Marker
+    Enabled: true
+    Name: Demo Object Marker
+    Namespaces:
+      fr3_demo_objects: true
+    Queue Size: 10
+    Topic:
+      Depth: 1
+      Durability Policy: Transient Local
+      History Policy: Keep Last
+      Reliability Policy: Reliable
+      Value: /fr3_demo/object_marker
+    Value: true
+  - Class: rviz_default_plugins/MarkerArray
+    Enabled: true
+    Name: Grasp Candidates
+    Namespaces:
+      fr3_grasp_candidates: true
+    Topic:
+      Depth: 1
+      Durability Policy: Transient Local
+      History Policy: Keep Last
+      Reliability Policy: Reliable
+      Value: /fr3_demo/grasp_markers
+    Value: true
+  - Class: moveit_rviz_plugin/PlanningScene
+    Enabled: true
+    Name: Live MoveIt Scene
+    Planning Scene Topic: /monitored_planning_scene
+    Robot Description: robot_description
+    Scene Geometry:
+      Scene Alpha: 0.45
+      Scene Color: 160; 160; 164
+      Show Scene Geometry: true
+    Scene Robot:
+      Robot Alpha: 1.0
+      Show Robot Collision: false
+      Show Robot Visual: true
+  Enabled: true
+  Global Options:
+    Background Color: 48; 48; 48
+    Fixed Frame: base_footprint
+    Frame Rate: 30
+  Name: root
+  Tools:
+  - Class: rviz_default_plugins/Interact
+    Hide Inactive Objects: true
+  - Class: rviz_default_plugins/MoveCamera
+  - Class: rviz_default_plugins/Select
+  Transformation:
+    Current:
+      Class: rviz_default_plugins/TF
+  Value: true
+  Views:
+    Current:
+      Class: rviz_default_plugins/Orbit
+      Distance: 1.45
+      Enable Stereo Rendering:
+        Stereo Eye Separation: 0.05999999865889549
+        Stereo Focal Distance: 1
+        Swap Stereo Eyes: false
+        Value: false
+      Focal Point:
+        X: 0.0
+        Y: -0.12
+        Z: 0.2
+      Focal Shape Fixed Size: true
+      Focal Shape Size: 0.05000000074505806
+      Invert Z Axis: false
+      Name: Current View
+      Near Clip Distance: 0.009999999776482582
+      Pitch: 0.6
+      Target Frame: base_footprint
+      Value: Orbit (rviz_default_plugins)
+      Yaw: 5.24
+    Saved: null
+Window Geometry:
+  Height: 950
+  Width: 1100
+  X: 800
+  Y: 40

@@ -1,0 +1,18 @@
+gemini_target_selector:
+  ros__parameters:
+    # Natural-language pick commands on /fr3_demo/pick_command, e.g. "gắp cái chuột".
+    # Gemini only picks WHICH perceived object; positions come from depth geometry.
+    # API key: GEMINI_API_KEY or ~/.config/fr3_demo/gemini_api_key (never logged).
+    model: gemini-robotics-er-2-preview
+    # Orbbec Astra Pro Plus (ros2_astra_camera, run_astra.sh) since 2026-10-31.
+    rgb_topic: /camera/color/image_raw
+    camera_info_topic: /camera/color/camera_info
+    # Real robot: no gripper yet, so only choose; never moves the arm.
+    # true: pick right away after Gemini's choice is validated; false: only set
+    # /fr3_demo/pick_target and wait for /fr3_demo/run_mtc_pick.
+    auto_pick: false
+    # Move the arm out of the camera's view (and refresh perception) first.
+    move_to_observe: false
+    request_timeout: 60.0
+    save_dir: ~/.ros/fr3_gemini
+    use_sim_time: false

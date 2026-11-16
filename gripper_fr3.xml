@@ -1,0 +1,279 @@
+<?xml version="1.0"?>
+<robot name="simple_3finger_gripper">
+
+  <!--
+    Simple 3-finger gripper URDF
+    Units: meter, kg, rad
+
+    Overall idea:
+    - base: cylinder
+    - body: cylinder
+    - 3 fingers placed every 120 deg around body
+    - each finger has 2 tapered triangular-prism-like links, approximated by meshless box geometry
+      because pure URDF primitive geometry does not support triangular prism.
+
+    Edit these dimensions directly if needed:
+    base radius  = 0.060
+    base height  = 0.020
+    body radius  = 0.040
+    body height  = 0.080
+    each phalanx length = 0.050
+  -->
+
+  <!-- Materials -->
+  <material name="dark_gray">
+    <color rgba="0.15 0.15 0.15 1.0"/>
+  </material>
+
+  <material name="blue">
+    <color rgba="0.1 0.35 0.9 1.0"/>
+  </material>
+
+  <material name="orange">
+    <color rgba="1.0 0.45 0.05 1.0"/>
+  </material>
+
+  <!-- Base: flat cylinder -->
+  <link name="base_link">
+    <visual>
+      <origin xyz="0 0 0.010" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="0.060" length="0.020"/>
+      </geometry>
+      <material name="dark_gray"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0.010" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="0.060" length="0.020"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0 0 0.010" rpy="0 0 0"/>
+      <mass value="0.20"/>
+      <inertia ixx="0.00008" ixy="0" ixz="0" iyy="0.00008" iyz="0" izz="0.00014"/>
+    </inertial>
+  </link>
+
+  <!-- Body: simple cylinder mounted on base -->
+  <link name="body_link">
+    <visual>
+      <origin xyz="0 0 0.040" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="0.040" length="0.080"/>
+      </geometry>
+      <material name="blue"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0.040" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="0.040" length="0.080"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0 0 0.040" rpy="0 0 0"/>
+      <mass value="0.30"/>
+      <inertia ixx="0.00020" ixy="0" ixz="0" iyy="0.00020" iyz="0" izz="0.00024"/>
+    </inertial>
+  </link>
+
+  <joint name="base_to_body" type="fixed">
+    <parent link="base_link"/>
+    <child link="body_link"/>
+    <origin xyz="0 0 0.020" rpy="0 0 0"/>
+  </joint>
+
+  <!-- ========================================================= -->
+  <!-- Finger 1, angle 0 deg, pointing +X                         -->
+  <!-- ========================================================= -->
+
+  <link name="finger_1_link_1">
+    <visual>
+      <origin xyz="0.025 0 0" rpy="0 0 0"/>
+      <geometry>
+        <!-- approximated tapered triangular-prism finger as narrow rectangular prism -->
+        <box size="0.050 0.018 0.018"/>
+      </geometry>
+      <material name="orange"/>
+    </visual>
+    <collision>
+      <origin xyz="0.025 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.050 0.018 0.018"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0.025 0 0" rpy="0 0 0"/>
+      <mass value="0.03"/>
+      <inertia ixx="0.000002" ixy="0" ixz="0" iyy="0.000009" iyz="0" izz="0.000009"/>
+    </inertial>
+  </link>
+
+  <joint name="finger_1_joint_1" type="revolute">
+    <parent link="body_link"/>
+    <child link="finger_1_link_1"/>
+    <origin xyz="0.040 0 0.070" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <!-- Main knuckle: negative direction folds inward; lower limit lets the 3 fingertips meet near the center. -->
+    <limit lower="-1.86" upper="0.0" effort="5" velocity="2"/>
+  </joint>
+
+  <link name="finger_1_link_2">
+    <visual>
+      <origin xyz="0.025 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.050 0.014 0.014"/>
+      </geometry>
+      <material name="orange"/>
+    </visual>
+    <collision>
+      <origin xyz="0.025 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.050 0.014 0.014"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0.025 0 0" rpy="0 0 0"/>
+      <mass value="0.02"/>
+      <inertia ixx="0.000001" ixy="0" ixz="0" iyy="0.000006" iyz="0" izz="0.000006"/>
+    </inertial>
+  </link>
+
+  <joint name="finger_1_joint_2" type="revolute">
+    <parent link="finger_1_link_1"/>
+    <child link="finger_1_link_2"/>
+    <origin xyz="0.050 0 0" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <!-- Tip joint: negative direction folds inward relative to link_1, max 45 deg. -->
+    <limit lower="-0.785398" upper="0.0" effort="5" velocity="2"/>
+  </joint>
+
+  <!-- ========================================================= -->
+  <!-- Finger 2, angle 120 deg                                   -->
+  <!-- ========================================================= -->
+
+  <link name="finger_2_link_1">
+    <visual>
+      <origin xyz="0.025 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.050 0.018 0.018"/>
+      </geometry>
+      <material name="orange"/>
+    </visual>
+    <collision>
+      <origin xyz="0.025 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.050 0.018 0.018"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0.025 0 0" rpy="0 0 0"/>
+      <mass value="0.03"/>
+      <inertia ixx="0.000002" ixy="0" ixz="0" iyy="0.000009" iyz="0" izz="0.000009"/>
+    </inertial>
+  </link>
+
+  <joint name="finger_2_joint_1" type="revolute">
+    <parent link="body_link"/>
+    <child link="finger_2_link_1"/>
+    <origin xyz="-0.020 0.034641 0.070" rpy="0 0 2.094395"/>
+    <axis xyz="0 1 0"/>
+    <!-- Main knuckle: negative direction folds inward; lower limit lets the 3 fingertips meet near the center. -->
+    <limit lower="-1.86" upper="0.0" effort="5" velocity="2"/>
+  </joint>
+
+  <link name="finger_2_link_2">
+    <visual>
+      <origin xyz="0.025 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.050 0.014 0.014"/>
+      </geometry>
+      <material name="orange"/>
+    </visual>
+    <collision>
+      <origin xyz="0.025 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.050 0.014 0.014"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0.025 0 0" rpy="0 0 0"/>
+      <mass value="0.02"/>
+      <inertia ixx="0.000001" ixy="0" ixz="0" iyy="0.000006" iyz="0" izz="0.000006"/>
+    </inertial>
+  </link>
+
+  <joint name="finger_2_joint_2" type="revolute">
+    <parent link="finger_2_link_1"/>
+    <child link="finger_2_link_2"/>
+    <origin xyz="0.050 0 0" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <!-- Tip joint: negative direction folds inward relative to link_1, max 45 deg. -->
+    <limit lower="-0.785398" upper="0.0" effort="5" velocity="2"/>
+  </joint>
+
+  <!-- ========================================================= -->
+  <!-- Finger 3, angle 240 deg                                   -->
+  <!-- ========================================================= -->
+
+  <link name="finger_3_link_1">
+    <visual>
+      <origin xyz="0.025 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.050 0.018 0.018"/>
+      </geometry>
+      <material name="orange"/>
+    </visual>
+    <collision>
+      <origin xyz="0.025 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.050 0.018 0.018"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0.025 0 0" rpy="0 0 0"/>
+      <mass value="0.03"/>
+      <inertia ixx="0.000002" ixy="0" ixz="0" iyy="0.000009" iyz="0" izz="0.000009"/>
+    </inertial>
+  </link>
+
+  <joint name="finger_3_joint_1" type="revolute">
+    <parent link="body_link"/>
+    <child link="finger_3_link_1"/>
+    <origin xyz="-0.020 -0.034641 0.070" rpy="0 0 4.188790"/>
+    <axis xyz="0 1 0"/>
+    <!-- Main knuckle: negative direction folds inward; lower limit lets the 3 fingertips meet near the center. -->
+    <limit lower="-1.86" upper="0.0" effort="5" velocity="2"/>
+  </joint>
+
+  <link name="finger_3_link_2">
+    <visual>
+      <origin xyz="0.025 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.050 0.014 0.014"/>
+      </geometry>
+      <material name="orange"/>
+    </visual>
+    <collision>
+      <origin xyz="0.025 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.050 0.014 0.014"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0.025 0 0" rpy="0 0 0"/>
+      <mass value="0.02"/>
+      <inertia ixx="0.000001" ixy="0" ixz="0" iyy="0.000006" iyz="0" izz="0.000006"/>
+    </inertial>
+  </link>
+
+  <joint name="finger_3_joint_2" type="revolute">
+    <parent link="finger_3_link_1"/>
+    <child link="finger_3_link_2"/>
+    <origin xyz="0.050 0 0" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <!-- Tip joint: negative direction folds inward relative to link_1, max 45 deg. -->
+    <limit lower="-0.785398" upper="0.0" effort="5" velocity="2"/>
+  </joint>
+
+</robot>

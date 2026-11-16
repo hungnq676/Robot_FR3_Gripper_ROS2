@@ -1,0 +1,52 @@
+chạy con cánh tay robot FR3
+
+bước1 khỏi tại môi trường và chạy spawner: 
+	- vào foder ros2_ws: cd ros2_ws
+	- khỏi tạo môi trường cho ros: source /opt/ros/humble/setup.bash
+	- khỏi tạo môi trường cho robot: source ~/ros2_ws/install/setup.bash
+	- chạy lệnh chạy spawer:
+		 ros2 launch fairino3_v6_moveit2_config spawn_controllers.launch.py
+
+bước2 chạy moveit2 lên: mở 1 cái terminal mới 
+	- chạy các khợi tạo cần thiết
+	- chạy cái lệnh chạy moveit2:
+		ros2 launch fairino3_v6_moveit2_config demo.launch.py
+
+bước3 kết nối với robot fr3:
+	- mở terminal mới
+	- chạy mấy lệnh khởi tạo
+	- chạy lệnh kết nối với robot:
+		ros2 run fairino_hardware ros2_cmd_server
+
+bước4 test lại hệ thống xem có thể chạy rpt_graph hoặc ros2 topic list
+******* MẤU TRỐT LÀ PHẢI CHẠY SPAWN TRƯỚC KHI KẾT NỐI VỚI CON ROBOT ******
+*******              KIỂM TRA PHẢI CÓ CÁI SPAWN CHẠY               *******
+
+ros2 topic list ra như này:
+
+:~/ros2_ws$ ros2 topic list
+/attached_collision_object
+/collision_object
+/display_contacts
+/display_planned_path
+/dynamic_joint_states
+/fairino3_controller/controller_state
+/fairino3_controller/joint_trajectory
+/fairino3_controller/state
+/fairino3_controller/transition_event
+/joint_state_broadcaster/transition_event
+/joint_states
+/monitored_planning_scene
+/motion_plan_request
+/parameter_events
+/planning_scene
+/planning_scene_world
+/recognized_object_array
+/robot_description
+/robot_description_semantic
+/rosout
+/rviz_moveit_motion_planning_display/robot_interaction_interactive_marker_topic/feedback
+/rviz_moveit_motion_planning_display/robot_interaction_interactive_marker_topic/update
+/tf
+/tf_static
+/trajectory_execution_event

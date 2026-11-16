@@ -1,0 +1,7 @@
+# Cartesian limits for the Pilz industrial motion planner (LIN/CIRC; PTP only
+# needs the joint limits). Conservative values for a table-top cobot.
+cartesian_limits:
+  max_trans_vel: 0.5
+  max_trans_acc: 1.0
+  max_trans_dec: -1.0
+  max_rot_vel: 1.57

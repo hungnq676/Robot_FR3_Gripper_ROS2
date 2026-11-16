@@ -1,0 +1,80 @@
+mtc_pick_task_planner:
+  ros__parameters:
+    arm_group: arm
+    hand_group: gripper
+    eef: custom_gripper
+    tcp_link: grasp_frame
+    support_id: work_table
+    mount_link: base_link
+    touch_links: [base_link_gripper, clamp_1, clamp_2]
+    world_frame: base_footprint
+
+    # What to pick, resolved against /fr3_demo/perceived_objects at every plan:
+    # an id ("obj_3") or colour/shape words ("green box", "cylinder").
+    # Change at runtime:
+    #   ros2 topic pub --once /fr3_demo/pick_target std_msgs/String "{data: 'obj_3'}"
+    target: green box
+
+    # run_mtc_pick first moves the arm to this SRDF pose (clear of the camera's
+    # view) and waits for perception to refresh before planning. "" disables.
+    # "home" (hand-set on the real robot): inside the table fences and clear of the
+    # camera view. The old SRDF "observe" now reaches past the camera-side fence.
+    observe.pose: home
+    observe.wait: 6.0
+
+    # Grasp derived from the perceived size. Jaw gap = jaw_gap_at_zero - 2*|q|.
+    gripper.jaw_gap_at_zero: 0.070
+    gripper.joint_limit: 0.036
+    # Per-jaw closing beyond the measured width. Real robot: small positive
+    # value (or a force-limited close). Simulation: negative, so the jaws stop
+    # 5 mm short of each face - the Gazebo weld holds the object, and jaws
+    # pressing on a welded object shove it off-centre and push the wrist off
+    # its trajectory.
+    gripper.squeeze: -0.005
+    # Force-guarded close with the RFP602 jaw pads (/fr3_demo/gripper/finger_forces):
+    # close at close_speed up to overtravel past the measured width and stop
+    # when both pads read contact_force. No contact on both -> abort, no lift.
+    # When enabled, the jaws touch the object, so squeeze above only sets the
+    # planned (not executed) close target.
+    gripper.guarded_close: true
+    gripper.contact_force: 2.0
+    gripper.close_speed: 0.005
+    gripper.overtravel: 0.008
+    # grasp_frame geometry: palm underside 23.5 mm above the TCP, fingertips
+    # 40 mm below it. The TCP height on the object keeps the object top
+    # palm_clearance under the palm, the fingertips table_clearance above the
+    # table, and at least min_finger_contact of finger on the object.
+    gripper.tcp_to_palm: 0.0235
+    gripper.tcp_to_fingertip: 0.040
+    gripper.palm_clearance: 0.008
+    # 5 mm keeps the jaws pushing near a low object's centre of mass (at 12 mm
+    # they pushed above it and tipped a 34 mm mouse over instead of sliding it).
+    # The "early" table contacts seen before came from the concave jaw collision
+    # meshes, now boxes.
+    gripper.table_clearance: 0.005
+    gripper.min_finger_contact: 0.015
+    # Boxes are gripped across their short side (0/180 deg); cylinders at any
+    # of these steps around their axis.
+    cylinder_grasp_angle_delta: 0.78539816339
+
+    gazebo_attach_timeout: 5.0
+    approach.min_distance: 0.16
+    approach.max_distance: 0.20
+    # Lift high enough that the carried object clears the other objects (a
+    # 164 mm bottle + 2 cm padding), so the carry can be a straight PTP move
+    # instead of an OMPL detour around them.
+    lift.min_distance: 0.15  # tall objects: as high as the arm reaches, at least 15 cm
+    lift.max_distance: 0.25
+    place.position: [0.30, 0.25, 0.30]
+    # Headings (about the vertical) offered for the place pose; the cheapest in
+    # joint travel is used.
+    place.yaw_steps: 12
+    # Pilz PTP (joint-space straight line) first for the moves to the pregrasp
+    # and to the place pose, OMPL as fallback; solutions ranked by joint travel.
+    planner.ptp_first: true
+    # Joint-limit penalty added to each segment's joint travel:
+    # limit_weight * max(0, (limit_margin - m) / limit_margin)^2 per joint, m =
+    # closest approach to that joint's limit (rad). 0 margin disables it.
+    planner.limit_margin: 0.3
+    planner.limit_weight: 5.0
+    max_solutions: 10

@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<sdf version="1.9">
+  <!-- Marker pen lying along its model x axis: 18 mm thick, 145 mm long.
+       Model frame = pen axis centre (place it 0.009 m above the tabletop).
+       Collision is a flat-sided box so the pen cannot roll, and mass/inertia are kept realistic: a 20 g pen with
+       ~1e-6 kg m^2 about its axis is unstable in bullet-featherstone while the
+       start-up weld holds it, and gets thrown off the table. -->
+  <model name="pen">
+    <static>false</static>
+    <link name="pen_link">
+      <inertial>
+        <mass>0.05</mass>
+        <inertia>
+          <ixx>0.000005</ixx>
+          <iyy>0.00009</iyy>
+          <izz>0.00009</izz>
+          <ixy>0</ixy><ixz>0</ixz><iyz>0</iyz>
+        </inertia>
+      </inertial>
+      <visual name="body_visual">
+        <pose>-0.01 0 0 0 1.5707963 0</pose>
+        <geometry><cylinder><radius>0.009</radius><length>0.125</length></cylinder></geometry>
+        <material>
+          <ambient>0.10 0.25 0.85 1</ambient>
+          <diffuse>0.10 0.30 0.95 1</diffuse>
+        </material>
+      </visual>
+      <visual name="cap_visual">
+        <pose>0.0625 0 0 0 1.5707963 0</pose>
+        <geometry><cylinder><radius>0.0095</radius><length>0.02</length></cylinder></geometry>
+        <material>
+          <ambient>0.9 0.9 0.9 1</ambient>
+          <diffuse>0.95 0.95 0.95 1</diffuse>
+        </material>
+      </visual>
+      <collision name="collision">
+        <!-- Flat-sided barrel (like a hexagonal marker) so the pen cannot roll. -->
+        <geometry><box><size>0.145 0.018 0.017</size></box></geometry>
+        <surface>
+          <friction>
+            <ode><mu>1.0</mu><mu2>1.0</mu2></ode>
+            <bullet><friction>1.0</friction><friction2>1.0</friction2></bullet>
+          </friction>
+        </surface>
+      </collision>
+    </link>
+    <plugin filename="gz-sim-pose-publisher-system"
+            name="gz::sim::systems::PosePublisher">
+      <publish_model_pose>true</publish_model_pose>
+      <publish_link_pose>false</publish_link_pose>
+      <publish_collision_pose>false</publish_collision_pose>
+      <publish_visual_pose>false</publish_visual_pose>
+      <publish_nested_model_pose>false</publish_nested_model_pose>
+      <update_frequency>20</update_frequency>
+    </plugin>
+  </model>
+</sdf>

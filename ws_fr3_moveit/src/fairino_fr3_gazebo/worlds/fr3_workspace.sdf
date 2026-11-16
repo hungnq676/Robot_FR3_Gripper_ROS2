@@ -1,0 +1,108 @@
+<?xml version="1.0"?>
+<sdf version="1.9">
+  <world name="fr3_workspace">
+    <gravity>0 0 -9.81</gravity>
+
+    <plugin filename="gz-sim-physics-system" name="gz::sim::systems::Physics"/>
+    <plugin filename="gz-sim-user-commands-system" name="gz::sim::systems::UserCommands"/>
+    <!-- Contact sensors (gripper jaw force pads). -->
+    <plugin filename="gz-sim-contact-system" name="gz::sim::systems::Contact"/>
+    <plugin filename="gz-sim-scene-broadcaster-system" name="gz::sim::systems::SceneBroadcaster"/>
+    <plugin filename="gz-sim-sensors-system" name="gz::sim::systems::Sensors">
+      <render_engine>ogre2</render_engine>
+    </plugin>
+
+    <!-- Raise indirect illumination without replacing the GLB materials.
+         This keeps the original cardboard texture visible to the RGB camera. -->
+    <scene>
+      <ambient>0.60 0.60 0.60 1</ambient>
+      <background>0.65 0.65 0.68 1</background>
+      <shadows>true</shadows>
+    </scene>
+
+    <light type="directional" name="sun">
+      <pose>0 0 10 0 0 0</pose>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <direction>-0.5 0.1 -0.9</direction>
+    </light>
+    <!-- Soft fill light keeps embedded GLB textures readable by both the
+         Gazebo camera and later YOLO training/inference. -->
+    <light type="point" name="workcell_fill_light">
+      <pose>0.90 0.55 2.50 0 0 0</pose>
+      <diffuse>1.0 1.0 1.0 1</diffuse>
+      <specular>0.15 0.15 0.15 1</specular>
+      <attenuation>
+        <range>8</range>
+        <constant>0.35</constant>
+        <linear>0.03</linear>
+        <quadratic>0.005</quadratic>
+      </attenuation>
+    </light>
+
+    <include><uri>model://table</uri></include>
+    <!-- Load the pick object before the robot is spawned so the robot's
+         DetachableJoint system can resolve demo_box::box_link. -->
+    <include>
+      <uri>model://demo_box</uri>
+      <name>demo_box</name>
+      <pose>0.90 0.56 1.05 0 0 0.5</pose>
+    </include>
+    <!-- Graspable test objects (each has a DetachableJoint in the robot's
+         Gazebo xacro, so they must be loaded before the robot is spawned).
+         Bottle 50 x 164 mm: centre 0.082 m above the table. -->
+    <include>
+      <uri>model://water_bottle</uri>
+      <name>water_bottle</name>
+      <pose>0.98 0.48 1.082 0 0 0</pose>
+    </include>
+    <!-- Scanned mouse ~55 x 112 x 34 mm, centre 0.017 m above the table. -->
+    <include>
+      <uri>model://computer_mouse</uri>
+      <name>computer_mouse</name>
+      <pose>0.82 0.72 1.017 0 0 -0.6</pose>
+    </include>
+    <!-- Marker pen 18 mm thick lying on the table, axis 0.009 m above it. -->
+    <include>
+      <uri>model://pen</uri>
+      <name>pen</name>
+      <pose>0.82 0.46 1.0085 0 0 -0.3</pose>
+    </include>
+    <!-- Static placement support behind the robot, at the back of the tabletop.
+         Its 0.16 m height puts the top surface at world z=1.16 m. -->
+    <include>
+      <uri>model://open_box</uri>
+      <name>open_box</name>
+      <pose>1.43 0.50 1.05 0 0 0</pose>
+    </include>
+    <!-- Simulation RGB-D camera: oblique view from the front of the table,
+         rolled 90 degrees to use the image width for the table's long axis.
+         This is a visibility setup, not the real camera's measured pose.
+         Keep in sync with OAK_POSE in launch/camera_bridge.launch.py. -->
+    <include>
+      <uri>model://oak_d_pro_w</uri>
+      <name>oak_d_pro_w</name>
+      <pose>0.52 0.64 1.95 1.57079632679 1.10 0</pose>
+    </include>
+    <!-- Camera-calibration landmark (tag36h11 id 0, black square 0.12 m on a 0.15 m plate).
+         Lies flat at the front of the table, in clear view of the OAK. Keep in sync with the landmark pose in
+         fairino_fr3_manipulation/config/camera_calibration.yaml. -->
+    <include>
+      <uri>model://apriltag_0</uri>
+      <pose>0.67 0.56 1.0005 0 0 0</pose>
+    </include>
+
+    <model name="ground">
+      <static>true</static>
+      <link name="ground_link">
+        <visual name="visual">
+          <geometry><plane><normal>0 0 1</normal><size>20 20</size></plane></geometry>
+          <material><ambient>0.7 0.7 0.7 1</ambient><diffuse>0.9 0.9 0.9 1</diffuse></material>
+        </visual>
+        <collision name="collision">
+          <geometry><plane><normal>0 0 1</normal><size>20 20</size></plane></geometry>
+        </collision>
+      </link>
+    </model>
+  </world>
+</sdf>

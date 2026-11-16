@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>test_moveit</name>
+  <version>0.0.0</version>
+  <description>Test MoveIt package</description>
+
+  <maintainer email="hung@todo.todo">hung</maintainer>
+  <license>MIT</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <depend>rclcpp</depend>
+  <depend>moveit_ros_planning_interface</depend>
+
+</package>

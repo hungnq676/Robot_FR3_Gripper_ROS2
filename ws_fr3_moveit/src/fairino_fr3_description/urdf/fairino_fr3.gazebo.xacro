@@ -1,0 +1,91 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <!-- Simulation-only "grasp": a fixed joint between the wrist and one object.
+       gz-sim creates the joint as soon as the plugin loads, so controllers.launch
+       sends a detach right after start-up. Each object has its own attach topic;
+       gazebo_grasp_attacher picks the object nearest the TCP. All share one
+       detach topic (only one object is held at a time). base_link_gripper is
+       merged into wrist3_link by fixed-joint reduction, hence the parent link. -->
+  <xacro:macro name="fr3_detachable_object" params="model link">
+    <gazebo>
+      <plugin filename="gz-sim-detachable-joint-system"
+              name="gz::sim::systems::DetachableJoint">
+        <parent_link>wrist3_link</parent_link>
+        <child_model>${model}</child_model>
+        <child_link>${link}</child_link>
+        <attach_topic>/fr3_demo/gz/attach/${model}</attach_topic>
+        <detach_topic>/fr3_demo/gazebo_detach</detach_topic>
+        <output_topic>/fr3_demo/gz/state/${model}</output_topic>
+      </plugin>
+    </gazebo>
+  </xacro:macro>
+
+  <!-- Jaw contact sensor. fairino_fr3_manipulation/scripts/fsr_emulator.py turns its contacts into an
+       RFP602 thin-film force reading for the pad on the jaw's inner face. -->
+  <xacro:macro name="fr3_jaw_contact_sensor" params="link">
+    <gazebo reference="${link}">
+      <sensor name="${link}_contact" type="contact">
+        <always_on>true</always_on>
+        <update_rate>200</update_rate>
+        <!-- a contact sensor takes its topic from inside <contact> -->
+        <contact>
+          <collision>${link}_collision</collision>
+          <topic>/fr3_demo/gz/contacts/${link}</topic>
+        </contact>
+      </sensor>
+    </gazebo>
+  </xacro:macro>
+
+  <xacro:macro name="fairino_fr3_gazebo" params="controller_config sim_objects:=true">
+    <gazebo>
+      <plugin filename="gz_ros2_control-system"
+              name="gz_ros2_control::GazeboSimROS2ControlPlugin">
+        <parameters>${controller_config}</parameters>
+      </plugin>
+    </gazebo>
+    <!-- Keep in sync with graspable_models in
+         fairino_fr3_manipulation/config/gazebo_grasp_attacher.yaml -->
+    <xacro:if value="${sim_objects}">
+    <xacro:fr3_detachable_object model="demo_box" link="box_link"/>
+    <xacro:fr3_detachable_object model="water_bottle" link="bottle_link"/>
+    <xacro:fr3_detachable_object model="computer_mouse" link="mouse_link"/>
+    <xacro:fr3_detachable_object model="pen" link="pen_link"/>
+    </xacro:if>
+    <xacro:fr3_jaw_contact_sensor link="clamp_1"/>
+    <xacro:fr3_jaw_contact_sensor link="clamp_2"/>
+
+    <!-- Hand-eye calibration target (simulation), matching the real robot
+         (2026-10-30): Hiwonder card, tag36h11 id 2, tag black square 33 mm
+         (fitted from 30 robot/camera pairs) inside a 50 mm black frame on a
+         64 mm white sticker (user's ruler), glued on the flat round cap
+         at the back end of the J6 axis, opposite the gripper flange.
+         That cap belongs to the J5 housing (wrist2_link mesh: y -0.048 face,
+         radius 40 mm, J6 axis = wrist2 +y through z 0.102), so the tag does
+         NOT turn with J6. Faces wrist2 -y, i.e. up when the tool points down.
+         Tag in-plane rotation on the real robot is arbitrary; calibration
+         estimates the exact pose. Previous version: side pad on wrist3_link
+         at xyz="0.042 0 0.0766" rpy="1.5707963 0 1.5707963", id 1, 36 mm.
+         Always present (also table_only), since it is glued on the real arm. -->
+    <link name="handeye_tag_link">
+      <visual>
+        <geometry>
+          <!-- mesh: 0.1 m plate, black square 0.08 m -> scale 0.4125 = 33 mm black -->
+          <mesh filename="package://fairino_fr3_description/meshes/visual/handeye_tag/handeye_tag_id2.obj"
+                scale="0.4125 0.4125 0.4125"/>
+        </geometry>
+      </visual>
+      <visual>
+        <!-- white sticker, 64 mm side (user's ruler, 2026-10-29) -->
+        <origin xyz="0 0 -0.0011" rpy="0 0 0"/>
+        <geometry><box size="0.064 0.064 0.002"/></geometry>
+        <material name="handeye_sticker_white"><color rgba="1 1 1 1"/></material>
+      </visual>
+    </link>
+    <joint name="handeye_tag_joint" type="fixed">
+      <parent link="wrist2_link"/>
+      <child link="handeye_tag_link"/>
+      <!-- tag normal (link z) along wrist2 -y, centred on the J6 axis -->
+      <origin xyz="0 -0.0502 0.102" rpy="1.5707963 0 0"/>
+    </joint>
+  </xacro:macro>
+</robot>

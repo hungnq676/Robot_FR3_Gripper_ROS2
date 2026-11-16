@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<sdf version="1.9">
+  <model name="work_table">
+    <static>true</static>
+    <!-- Real robot table top: 1.00 x 0.50 m (x along its length). The robot
+         base centre is 0.36 m from the back edge (0.64 m from the front edge with
+         the tags) and 0.17 m from the left long edge (tape-measured 2026-10-28). The base below is not modelled exactly. -->
+    <pose>1.06 0.64 0.50 0 0 0</pose>
+    <link name="table_link">
+      <visual name="visual">
+        <geometry><box><size>1.0 0.5 1.0</size></box></geometry>
+        <material>
+          <ambient>0.35 0.22 0.12 1</ambient>
+          <diffuse>0.55 0.35 0.18 1</diffuse>
+        </material>
+      </visual>
+      <collision name="collision">
+        <geometry><box><size>1.0 0.5 1.0</size></box></geometry>
+      </collision>
+    </link>
+  </model>
+</sdf>

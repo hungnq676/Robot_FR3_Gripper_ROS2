@@ -1,0 +1,23 @@
+moveit_setup_assistant_config:
+  urdf:
+    package: fr3_with_custom_gripper_description
+    relative_path: urdf/fairino3_v6_with_custom_gripper.urdf
+  srdf:
+    relative_path: config/fairino3_v6_with_custom_gripper.srdf
+  package_settings:
+    author_name: fa
+    author_email: fa@123.com
+    generated_timestamp: 1782965247
+  control_xacro:
+    command:
+      - position
+    state:
+      - position
+  modified_urdf:
+    xacros:
+      - control_xacro
+  control_xacro:
+    command:
+      - position
+    state:
+      - position

@@ -1,0 +1,43 @@
+handeye_calibration:
+  ros__parameters:
+    # Eye-to-hand: fixed OAK camera, AprilTag fixed on the robot (J6 or gripper).
+    base_frame: base_footprint
+    # Link the tag is rigidly attached to. Real robot (2026-10-29): tag on the
+    # flat round cap at the back end of the J6 axis, opposite the gripper
+    # flange. That cap is part of the J5 housing (wrist2_link), it does NOT
+    # turn with J6. (Old sim pad on the J6 side: wrist3_link.)
+    gripper_frame: wrist2_link
+    tcp_link: grasp_frame
+    camera_base_frame: oak-d-base-frame
+    image_topic: /oak/rgb/image_raw
+    camera_info_topic: /oak/rgb/camera_info
+
+    tag_id: 2                 # table corner tags are id 1 and id 3
+    tag_size: 0.0339          # inner black square of the Hiwonder card (outer frame 50 mm); 33.9 mm = reprojection minimum of calibration round 5 (33.0 left distances 2.4% short)
+    # Rough mounting, only used to aim the tag at the camera (it is estimated):
+    # centre of the J6 end cap (wrist2 mesh face y = -0.048, J6 axis through
+    # z = 0.102), tag facing wrist2 -y, i.e. away from the flange.
+    nominal_tag_in_gripper: [0.0, -0.0502, 0.102]
+    nominal_tag_normal_in_gripper: [0.0, -1.0, 0.0]
+    # Tool axis (wrist3 +z, toward the gripper) expressed in wrist2_link: +y.
+    # The tag faces the camera exactly when the tool points away from it.
+    tool_axis_in_gripper: [0.0, 1.0, 0.0]
+    max_joint_travel: 1.5     # rad; longer planned paths are rejected, not executed
+
+    # Tag positions are sampled in this box (base frame), in view of the camera.
+    # TODO real robot: re-centre on the new (top-down) camera; the 50 mm tag
+    # spans ~36 px at ~1.05 m from the OAK.
+    workspace_center: [0.30, -0.30, 0.40]
+    workspace_spread: [0.08, 0.08, 0.06]
+    max_tilt_deg: 35.0
+    num_poses: 25
+    min_samples: 8
+    frames_per_pose: 5
+    max_reprojection_error_px: 1.0
+    velocity_scaling: 0.25
+    random_seed: 7
+    return_to_observe: true
+    output_file: ~/.ros/fr3_oak_handeye.yaml
+    samples_file: ~/.ros/fr3_handeye_samples.npz
+    solve_only: false
+    use_sim_time: true        # the launch sets false with real:=true

@@ -1,0 +1,19 @@
+fsr_emulator:
+  ros__parameters:
+    # Simulation only. The FSR sits under a rigid plate covering each jaw's
+    # contact face (gripper frame base_link_gripper: finger width y 0..46 mm,
+    # fingertips at z = 90 mm). A small centred pad missed edge contacts of
+    # objects a few degrees off; the plate sees every touch on the jaw face.
+    pad_center_y: 0.023
+    pad_center_z: 0.060
+    pad_width: 0.046
+    pad_length: 0.060
+    # RFP602 (FSR402-class): R ~ fsr_r0 / F, 10 kOhm divider to a 12-bit ADC.
+    fsr_r0: 30000.0
+    divider_r: 10000.0
+    max_force: 49.0            # 5 kg
+    trigger_force: 0.2         # 20 g
+    contact_force: 0.5         # contact_clamp_* threshold, N
+    noise_fraction: 0.03
+    publish_rate: 100.0
+    use_sim_time: true

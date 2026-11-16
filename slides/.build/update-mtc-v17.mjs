@@ -1,0 +1,14 @@
+import fs from 'node:fs/promises';import {FileBlob,PresentationFile} from '@oai/artifact-tool';
+const root='/home/duong-12a/fr3_hungros2/slides';const p=await PresentationFile.importPptx(await FileBlob.load(root+'/output/FR3_slide_01_14_v16.pptx'));const s=p.slides.items[10];
+for(const q of s.shapes.items){if(q.position.top>=225&&q.position.top<674){q.text='';q.fill='none';}}
+function tx(t,x,y,w,h,size=24,color='#252525',bold=false){let q=s.shapes.add({geometry:'textbox',position:{left:x,top:y,width:w,height:h},fill:'none',line:{fill:'none',width:0}});q.text=t;q.text.style={typeface:'DejaVu Sans',fontSize:size,bold,color};}
+function rect(x,y,w,h,fill){s.shapes.add({geometry:'rect',position:{left:x,top:y,width:w,height:h},fill,line:{fill:'none',width:0}})}
+tx('FR3 + ROS 2',64,242,440,39,27,'#B5121B',true);tx('FR3 thực hiện thao tác; ROS 2 kết nối các khối xử lý và điều khiển qua driver, SDK/API của hãng.',64,289,440,107,24);
+tx('MoveIt 2',64,430,440,39,27,'#B5121B',true);tx('Cung cấp mô hình robot, giải IK, kiểm tra va chạm và các công cụ lập kế hoạch chuyển động.',64,478,440,111,24);
+rect(550,239,4,349,'#E6E6E6');
+tx('MTC · MoveIt Task Constructor',589,242,626,40,27,'#B5121B',true);
+tx('Tổ chức tác vụ thành các giai đoạn, dùng công cụ của MoveIt để tìm và nối các chuyển động thành một lời giải khả thi.',589,295,626,112,25);
+tx('Trong hệ thống của nhóm',589,431,626,36,24,'#B5121B',true);tx('Lập chuỗi chuyển động trước khi chạy; phối hợp lệnh kẹp và thả ở các mốc tương ứng.',589,478,626,87,24);
+rect(64,606,1152,48,'#FFF3F3');tx('Điểm chờ → tiến vào → kẹp → nhấc → tới hộp → hạ / thả → rút lên → HOME',76,614,1128,35,23,'#B5121B',true);
+s.speakerNotes.text='MTC là MoveIt Task Constructor, framework tác vụ ghép các stage chuyển động, sinh tư thế và giải IK; không phải bộ điều khiển động cơ hoặc một thuật toán tối ưu đường đi duy nhất. MoveIt2 cung cấp planning scene, IK/collision, planners. MTC tổ chức bài toán nhiều giai đoạn và nối các nghiệm giữa các stage. Trong tools/mtc_pregrasp.py build_task chế độ --into-box tạo7 đoạn quỹ đạo cánh tay: tới điểm chờ, tiến vào, nhấc, tới hộp, hạ, rút lên, HOME. Lệnh kẹp/thả được chương trình điều phối thực hiện xen giữa các đoạn, không phải toàn bộ gripper vật lý tự được MTC thực thi. Dòng chuỗi trên slide gồm cả hành động gripper để minh họa toàn tác vụ nên có8 mục, không gọi là8 quỹ đạo. Chế độ gắp đơn lẻ không có cùngchuỗi đầy đủ. Driver quaSDK/API mới gửi lệnhFR3. Mã dùngPilzPTP vàCartesian; chi tiết triển khai để phần phương pháp. Nguồn: tools/mtc_pregrasp.py:103–195,738–856; https://moveit.picknik.ai/main/doc/concepts/moveit_task_constructor/moveit_task_constructor.html .';
+await(await PresentationFile.exportPptx(p)).save(root+'/.build/slide-1-14-v17.pptx');await fs.writeFile(root+'/output/FR3_slide_11_v17.png',new Uint8Array(await(await p.export({slide:s,format:'png',scale:1})).arrayBuffer()));console.log('done');

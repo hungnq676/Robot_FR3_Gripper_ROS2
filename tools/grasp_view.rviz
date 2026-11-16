@@ -1,0 +1,77 @@
+Panels:
+  - Class: rviz_common/Displays
+    Name: Displays
+Visualization Manager:
+  Class: ""
+  Displays:
+    - Class: rviz_default_plugins/Grid
+      Name: Grid
+      Enabled: true
+      Cell Size: 0.1
+      Plane Cell Count: 20
+      Reference Frame: base_footprint
+      Value: true
+    - Class: rviz_default_plugins/RobotModel
+      Name: RobotModel
+      Enabled: true
+      Description Source: Topic
+      Description Topic:
+        Value: /robot_description
+        Durability Policy: Transient Local
+      Alpha: 0.6
+      Value: true
+    - Class: rviz_default_plugins/PointCloud2
+      Name: Object cloud
+      Enabled: true
+      Topic:
+        Value: /fr3_demo/object_cloud
+        Durability Policy: Transient Local
+        Reliability Policy: Reliable
+        History Policy: Keep Last
+        Depth: 1
+      Color Transformer: RGB8
+      Style: Points
+      Size (Pixels): 4
+      Value: true
+    - Class: rviz_default_plugins/MarkerArray
+      Name: Box and grasps
+      Enabled: true
+      Topic:
+        Value: /fr3_demo/grasp_markers
+        Durability Policy: Transient Local
+        Reliability Policy: Reliable
+        History Policy: Keep Last
+        Depth: 1
+      Value: true
+    - Class: rviz_default_plugins/TF
+      Name: TF
+      Enabled: true
+      Show Names: false
+      Marker Scale: 0.15
+      Frames:
+        All Enabled: false
+        base_footprint:
+          Value: true
+        camera_color_optical_frame:
+          Value: true
+      Value: true
+  Global Options:
+    Fixed Frame: base_footprint
+    Background Color: 48; 48; 48
+  Tools:
+    - Class: rviz_default_plugins/Interact
+    - Class: rviz_default_plugins/MoveCamera
+  Views:
+    Current:
+      Class: rviz_default_plugins/Orbit
+      Distance: 0.6
+      Focal Point:
+        X: -0.5
+        Y: 0.3
+        Z: 0.03
+      Pitch: 0.6
+      Yaw: 2.4
+      Target Frame: <Fixed Frame>
+Window Geometry:
+  Width: 1100
+  Height: 800

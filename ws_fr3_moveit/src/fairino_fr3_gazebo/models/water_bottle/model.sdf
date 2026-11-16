@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<sdf version="1.9">
+  <model name="water_bottle">
+    <static>false</static>
+    <self_collide>false</self_collide>
+    <!-- The model frame is the centre of the collision cylinder.
+         Scaled to 5/7 of the original 70 x 230 mm bottle (now 50 x 164 mm) so
+         the 68 mm gripper can take it. -->
+    <link name="bottle_link">
+      <inertial>
+        <mass>0.12</mass>
+        <inertia>
+          <ixx>0.000288</ixx>
+          <iyy>0.000288</iyy>
+          <izz>0.0000375</izz>
+          <ixy>0</ixy><ixz>0</ixz><iyz>0</iyz>
+        </inertia>
+      </inertial>
+
+      <visual name="bottle_visual">
+        <!-- Source GLB is Y-up. Rx(+90 deg) makes it Z-up and the translation
+             puts its geometric centre at the cylinder link origin. The GLB's
+             embedded 1024x1024 texture is intentionally left unmodified. -->
+        <pose>0 0.000016 -0.0821 1.57079632679 0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>model://water_bottle/meshes/water_bottle.glb</uri>
+            <scale>0.0044905 0.0044905 0.0044905</scale>
+          </mesh>
+        </geometry>
+      </visual>
+
+      <!-- Primitive collision is stable and intentionally follows the outer
+           bottle envelope instead of the detailed transparent GLB surface. -->
+      <collision name="bottle_collision">
+        <geometry>
+          <cylinder><radius>0.025</radius><length>0.164</length></cylinder>
+        </geometry>
+        <surface>
+          <friction>
+            <ode><mu>0.8</mu><mu2>0.8</mu2></ode>
+            <bullet><friction>0.8</friction><friction2>0.8</friction2></bullet>
+          </friction>
+          <contact><collide_without_contact>false</collide_without_contact></contact>
+        </surface>
+      </collision>
+    </link>
+
+    <plugin filename="gz-sim-pose-publisher-system"
+            name="gz::sim::systems::PosePublisher">
+      <publish_model_pose>true</publish_model_pose>
+      <publish_link_pose>false</publish_link_pose>
+      <publish_collision_pose>false</publish_collision_pose>
+      <publish_visual_pose>false</publish_visual_pose>
+      <publish_nested_model_pose>false</publish_nested_model_pose>
+      <update_frequency>20</update_frequency>
+    </plugin>
+  </model>
+</sdf>

@@ -1,0 +1,25 @@
+attached_object_demo:
+  ros__parameters:
+    arm_group: arm
+    gripper_group: gripper
+    tcp_link: grasp_frame
+    object_id: demo_box
+
+    # The object starts at the TCP, between the two fingers.
+    object_frame: grasp_frame
+    object_dimensions: [0.035, 0.035, 0.060]
+    object_position: [0.0, 0.0, 0.0]
+
+    lift_distance: 0.12
+    cartesian_step: 0.005
+    minimum_cartesian_fraction: 0.95
+    velocity_scaling: 0.15
+    acceleration_scaling: 0.10
+    stage_pause_seconds: 2.0
+
+    touch_links:
+      - wrist3_link
+      - base_link_gripper
+      - clamp_1
+      - clamp_2
+      - grasp_frame

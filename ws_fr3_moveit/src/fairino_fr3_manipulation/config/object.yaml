@@ -1,0 +1,16 @@
+object_description_publisher:
+  ros__parameters:
+    object.id: demo_box
+    object.frame_id: base_footprint
+    object.shape: box
+
+    # Box dimensions in metres.
+    object.dimensions: [0.04, 0.04, 0.10]
+
+    # The grid is z=0. A 0.10 m tall box has its centre at z=0.05,
+    # therefore its bottom face lies exactly on the grid/table surface.
+    object.position: [0.40, -0.15, 0.05]
+    object.orientation: [0.0, 0.0, 0.0, 1.0]
+
+    object.color: [0.10, 0.80, 0.20, 1.0]
+    publish_rate: 1.0

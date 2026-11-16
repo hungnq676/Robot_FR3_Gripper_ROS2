@@ -1,0 +1,6 @@
+   6.5 s  command: 'gắp cái chuột'
+   6.5 s  moving to the observe pose and refreshing perception ...
+  20.6 s  'gắp cái chuột' -> #3 = obj_4 (white box): gắp cái chuột translates to pick the mouse, which corresponds to the white computer mouse labeled with number 3.
+  21.1 s  picking obj_4 ...
+ 101.7 s  pick done: TASK_EXECUTION_SUCCESS: planned pick-and-carry trajectory completed
+saved /home/duong-12a/fr3_hungros2/bao_cao/du_lieu_mo_phong/chuot

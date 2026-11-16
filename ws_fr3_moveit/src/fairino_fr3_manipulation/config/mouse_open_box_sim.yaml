@@ -1,0 +1,52 @@
+mtc_pick_task_planner:
+  ros__parameters:
+    approach.max_distance: 0.14
+    approach.min_distance: 0.1
+    arm_group: arm
+    cylinder_grasp_angle_delta: 0.78539816339
+    eef: custom_gripper
+    gazebo_attach_timeout: 5.0
+    grasp.external_tcp:
+    - 0.0043698810040950775
+    - -0.38423624634742737
+    - 0.046
+    - -0.44190532277738137
+    - 0.8970616955934627
+    - 0.0
+    - 0.0
+    gripper.close_speed: 0.005
+    gripper.contact_force: 2.0
+    gripper.guarded_close: false
+    gripper.jaw_gap_at_zero: 0.07
+    gripper.joint_limit: 0.036
+    gripper.min_finger_contact: 0.015
+    gripper.overtravel: 0.008
+    gripper.palm_clearance: 0.008
+    gripper.squeeze: -0.005
+    gripper.table_clearance: 0.005
+    gripper.tcp_to_fingertip: 0.04
+    gripper.tcp_to_palm: 0.0235
+    hand_group: gripper
+    lift.max_distance: 0.25
+    lift.min_distance: 0.15
+    max_solutions: 3
+    mount_link: base_link
+    observe.pose: ''
+    observe.wait: 6.0
+    place.position:
+    - 0.22
+    - 0.23
+    - 0.2
+    place.release_into_box: true
+    place.yaw_steps: 12
+    planner.limit_margin: 0.3
+    planner.limit_weight: 5.0
+    planner.ptp_first: true
+    support_id: work_table
+    target: obj_20
+    tcp_link: grasp_frame
+    touch_links:
+    - base_link_gripper
+    - clamp_1
+    - clamp_2
+    world_frame: base_footprint

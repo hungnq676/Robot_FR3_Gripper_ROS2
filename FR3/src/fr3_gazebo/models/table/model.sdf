@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<sdf version="1.8">
+  <model name="table">
+    <!-- Bàn cố định: không rơi, không bị đẩy, không cần mass/inertia -->
+    <static>true</static>
+
+    <link name="table_link">
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>model://table/meshes/ban_1m5x1m_h1m.stl</uri>
+            <scale>0.001 0.001 0.001</scale>
+          </mesh>
+        </geometry>
+
+        <material>
+          <ambient>0.35 0.20 0.10 1</ambient>
+          <diffuse>0.55 0.32 0.16 1</diffuse>
+          <specular>0.10 0.08 0.05 1</specular>
+        </material>
+      </visual>
+
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <uri>model://table/meshes/ban_1m5x1m_h1m.stl</uri>
+            <scale>0.001 0.001 0.001</scale>
+          </mesh>
+        </geometry>
+
+        <!-- Ma sát mặt bàn để vật không trượt quá dễ -->
+        <surface>
+          <friction>
+            <ode>
+              <mu>0.8</mu>
+              <mu2>0.8</mu2>
+            </ode>
+          </friction>
+        </surface>
+      </collision>
+    </link>
+  </model>
+</sdf>

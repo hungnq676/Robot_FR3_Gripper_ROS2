@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro"
+       name="fairino3_v6_with_custom_gripper_gazebo">
+
+  <!-- Main robot: FR3 + custom gripper -->
+  <xacro:include filename="$(find fr3_with_custom_gripper_description)/urdf/fairino3_v6_with_custom_gripper.urdf" />
+
+  <!-- Gazebo ros2_control plugin + controlled joints -->
+  <xacro:include filename="$(find fr3_gazebo)/config/fr3_gazebo_control.xacro" />
+
+</robot>

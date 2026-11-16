@@ -1,0 +1,17 @@
+{"kind":"textbox","id":"sh/pc76hkr2","slideIndex":5,"position":{"left":64,"top":226,"width":1152,"height":49},"text":"Nhóm đã tiến hành thử nghiệm YOLO và mô hình thị giác–ngôn ngữ Gemini","geometry":"rect","lineWidth":0,"style":{"fontSize":24,"typeface":"DejaVu Sans","color":"#555555","alignment":"left"}}
+{"kind":"textbox","id":"sh/h4bupgn6","slideIndex":5,"position":{"left":64,"top":291,"width":550,"height":39},"text":"YOLO · tập lớp cố định","geometry":"rect","lineWidth":0,"style":{"fontSize":28,"typeface":"DejaVu Sans","color":"#B5121B","bold":true,"alignment":"left"}}
+{"kind":"textbox","id":"sh/u1kbu1ov","slideIndex":5,"position":{"left":101,"top":404,"width":475,"height":42},"text":"ẢNH THỬ NGHIỆM YOLO","geometry":"rect","lineWidth":0,"style":{"fontSize":26,"typeface":"DejaVu Sans","color":"#777777","bold":true,"alignment":"left"}}
+{"kind":"textbox","id":"sh/xcz2l03q","slideIndex":6,"position":{"left":64,"top":641,"width":1152,"height":25},"text":"Phạm vi so sánh: YOLO tập lớp cố định; không bao gồm YOLO-World hoặc các biến thể từ vựng mở.","geometry":"rect","lineWidth":0,"style":{"fontSize":16,"typeface":"DejaVu Sans","color":"#555555","alignment":"left"}}
+[
+  { id: '18', text: '', pos: t {} },
+  { id: '4', text: '', pos: t {} },
+  { id: '6', text: '', pos: t {} },
+  { id: '12', text: '', pos: t {} },
+  { id: '13', text: 'ẢNH THỬ NGHIỆM YOLO', pos: t {} },
+  { id: '14', text: 'Bổ sung sau lần chạy mô phỏng', pos: t {} },
+  {
+    id: '16',
+    text: 'Kết quả: đang bổ sung ảnh và thông tin cấu hình để hoàn thiện đối chiếu.',
+    pos: t {}
+  }
+]

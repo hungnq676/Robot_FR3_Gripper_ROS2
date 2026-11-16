@@ -1,0 +1,10 @@
+handeye_calibration:
+  ros__parameters:
+    # Real cell overrides, loaded on top of handeye_calibration.yaml by
+    # handeye_calibration.launch.py when real:=true. Camera since 2026-10-31:
+    # Orbbec Astra Pro Plus (ros2_astra_camera, run_astra.sh), 640x480 colour.
+    camera_base_frame: camera_link
+    image_topic: /camera/color/image_raw
+    camera_info_topic: /camera/color/camera_info
+    output_file: ~/.ros/fr3_astra_handeye.yaml
+    samples_file: ~/.ros/fr3_astra_handeye_samples.npz

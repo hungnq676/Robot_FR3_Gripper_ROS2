@@ -1,0 +1,27 @@
+camera_calibration_apriltag:
+  ros__parameters:
+    image_topic: /oak/rgb/image_raw
+    camera_info_topic: /oak/rgb/camera_info
+    # Depth aligned to RGB; a plane fit on the tag fixes the PnP tilt/range.
+    depth_topic: /oak/stereo/image_raw
+    use_depth_refinement: true
+    camera_base_frame: oak-d-base-frame
+
+    # Landmark: tag36h11 id 0, black square 0.12 m (measure the printed tag!).
+    tag_family: "36h11"
+    tag_id: 0
+    tag_size: 0.12
+
+    # Known pose of the tag centre in landmark_frame. Tag frame: x = tag right,
+    # y = tag top, z = out of the printed face. On the real robot, measure this
+    # relative to the robot (e.g. touch the tag corners with the TCP).
+    # Simulation: model apriltag_0 at world (0.67, 0.56), top face z = 1.001;
+    # its texture is mapped so the tag's x axis points along world -y (yaw -90 deg).
+    landmark_frame: world
+    landmark_xyz: [0.67, 0.56, 1.001]
+    landmark_rpy: [0.0, 0.0, -1.5707963]
+
+    samples: 30
+    max_reprojection_error_px: 1.5
+    output_file: ~/.ros/fr3_oak_extrinsics.yaml
+    use_sim_time: true

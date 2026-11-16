@@ -1,0 +1,807 @@
+<sdf version='1.11'>
+  <model name='fairino3_v6_with_custom_gripper'>
+    <static>true</static>
+    <link name='base_link'>
+      <inertial>
+        <pose>-0.00049027000000000001 -0.00045094999999999998 0.032527 0 0 0</pose>
+        <mass>0.78393000000000002</mass>
+        <inertia>
+          <ixx>0.0013854</ixx>
+          <ixy>1.1455e-05</ixy>
+          <ixz>-1.0642000000000001e-05</ixz>
+          <iyy>0.0013849000000000001</iyy>
+          <iyz>-9.7435000000000008e-06</iyz>
+          <izz>0.001977</izz>
+        </inertia>
+      </inertial>
+      <collision name='base_link_collision'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://fairino_description/meshes/fairino3_v6/base_link.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='base_link_visual'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://fairino_description/meshes/fairino3_v6/base_link.STL</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <diffuse>1 1 1 1</diffuse>
+          <ambient>1 1 1 1</ambient>
+        </material>
+      </visual>
+    </link>
+    <joint name='j1' type='revolute'>
+      <pose relative_to='base_link'>0 0 0 0 0 0</pose>
+      <parent>base_link</parent>
+      <child>shoulder_link</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-3.0543</lower>
+          <upper>3.0543</upper>
+          <effort>150</effort>
+          <velocity>3.1499999999999999</velocity>
+        </limit>
+        <dynamics>
+          <damping>0</damping>
+          <friction>0</friction>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='shoulder_link'>
+      <pose relative_to='j1'>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>-3.8658000000000001e-07 -0.0024175999999999998 0.13519 0 0 0</pose>
+        <mass>2.1225000000000001</mass>
+        <inertia>
+          <ixx>0.0033227</ixx>
+          <ixy>-5.0647999999999998e-08</ixy>
+          <ixz>-6.3400999999999996e-09</ixz>
+          <iyy>0.0032418999999999998</iyy>
+          <iyz>4.3767999999999998e-05</iyz>
+          <izz>0.0023129000000000001</izz>
+        </inertia>
+      </inertial>
+      <collision name='shoulder_link_collision'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://fairino_description/meshes/fairino3_v6/shoulder_link.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='shoulder_link_visual'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://fairino_description/meshes/fairino3_v6/shoulder_link.STL</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <diffuse>1 1 1 1</diffuse>
+          <ambient>1 1 1 1</ambient>
+        </material>
+      </visual>
+    </link>
+    <joint name='j2' type='revolute'>
+      <pose relative_to='shoulder_link'>0 0 0.14000000000000001 1.5708 0 0</pose>
+      <parent>shoulder_link</parent>
+      <child>upperarm_link</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-4.6250999999999998</lower>
+          <upper>1.4835</upper>
+          <effort>150</effort>
+          <velocity>3.1499999999999999</velocity>
+        </limit>
+        <dynamics>
+          <damping>0</damping>
+          <friction>0</friction>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='upperarm_link'>
+      <pose relative_to='j2'>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>-0.14111000000000001 3.4655999999999999e-06 0.11053 0 0 0</pose>
+        <mass>4.8052999999999999</mass>
+        <inertia>
+          <ixx>0.0075944999999999997</ixx>
+          <ixy>3.7142999999999998e-07</ixy>
+          <ixz>-7.9227999999999993e-12</ixz>
+          <iyy>0.0081317000000000004</iyy>
+          <iyz>-1.2918e-11</iyz>
+          <izz>0.0059230999999999997</izz>
+        </inertia>
+      </inertial>
+      <collision name='upperarm_link_collision'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://fairino_description/meshes/fairino3_v6/upperarm_link.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='upperarm_link_visual'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://fairino_description/meshes/fairino3_v6/upperarm_link.STL</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <diffuse>1 1 1 1</diffuse>
+          <ambient>1 1 1 1</ambient>
+        </material>
+      </visual>
+    </link>
+    <joint name='j3' type='revolute'>
+      <pose relative_to='upperarm_link'>-0.28000000000000003 0 0 0 0 0</pose>
+      <parent>upperarm_link</parent>
+      <child>forearm_link</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-2.8273999999999999</lower>
+          <upper>2.8273999999999999</upper>
+          <effort>150</effort>
+          <velocity>3.1499999999999999</velocity>
+        </limit>
+        <dynamics>
+          <damping>0</damping>
+          <friction>0</friction>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='forearm_link'>
+      <pose relative_to='j3'>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>-0.18987000000000001 5.2267999999999997e-06 0.0034145 0 0 0</pose>
+        <mass>2.2311999999999999</mass>
+        <inertia>
+          <ixx>0.0028852000000000001</ixx>
+          <ixy>7.3389000000000002e-07</ixy>
+          <ixz>-3.5373000000000002e-05</ixz>
+          <iyy>0.0035144999999999998</iyy>
+          <iyz>-2.8527000000000001e-07</iyz>
+          <izz>0.0029185999999999999</izz>
+        </inertia>
+      </inertial>
+      <collision name='forearm_link_collision'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://fairino_description/meshes/fairino3_v6/forearm_link.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='forearm_link_visual'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://fairino_description/meshes/fairino3_v6/forearm_link.STL</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <diffuse>1 1 1 1</diffuse>
+          <ambient>1 1 1 1</ambient>
+        </material>
+      </visual>
+    </link>
+    <joint name='j4' type='revolute'>
+      <pose relative_to='forearm_link'>-0.24001 0 0 0 0 0</pose>
+      <parent>forearm_link</parent>
+      <child>wrist1_link</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-4.6250999999999998</lower>
+          <upper>1.4835</upper>
+          <effort>28</effort>
+          <velocity>3.2000000000000002</velocity>
+        </limit>
+        <dynamics>
+          <damping>0</damping>
+          <friction>0</friction>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='wrist1_link'>
+      <pose relative_to='j4'>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>4.5665e-07 -0.0034665999999999998 0.098292000000000004 0 0 0</pose>
+        <mass>1.5961000000000001</mass>
+        <inertia>
+          <ixx>0.0020111999999999999</ixx>
+          <ixy>6.8085000000000002e-09</ixy>
+          <ixz>2.4944999999999999e-08</ixz>
+          <iyy>0.0014524</iyy>
+          <iyz>3.2511000000000001e-05</iyz>
+          <izz>0.0019076</izz>
+        </inertia>
+      </inertial>
+      <collision name='wrist1_link_collision'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://fairino_description/meshes/fairino3_v6/wrist1_link.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='wrist1_link_visual'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://fairino_description/meshes/fairino3_v6/wrist1_link.STL</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <diffuse>1 1 1 1</diffuse>
+          <ambient>1 1 1 1</ambient>
+        </material>
+      </visual>
+    </link>
+    <joint name='j5' type='revolute'>
+      <pose relative_to='wrist1_link'>0 0 0.10199999999999999 1.5708 0 0</pose>
+      <parent>wrist1_link</parent>
+      <child>wrist2_link</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-3.0543</lower>
+          <upper>3.0543</upper>
+          <effort>28</effort>
+          <velocity>3.2000000000000002</velocity>
+        </limit>
+        <dynamics>
+          <damping>0</damping>
+          <friction>0</friction>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='wrist2_link'>
+      <pose relative_to='j5'>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>-4.5261999999999999e-07 0.0034665999999999998 0.098292000000000004 0 0 0</pose>
+        <mass>1.5961000000000001</mass>
+        <inertia>
+          <ixx>0.0020111999999999999</ixx>
+          <ixy>6.8085999999999998e-09</ixy>
+          <ixz>-2.4944999999999999e-08</ixz>
+          <iyy>0.0014524</iyy>
+          <iyz>-3.2511000000000001e-05</iyz>
+          <izz>0.0019076</izz>
+        </inertia>
+      </inertial>
+      <collision name='wrist2_link_collision'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://fairino_description/meshes/fairino3_v6/wrist2_link.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='wrist2_link_visual'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://fairino_description/meshes/fairino3_v6/wrist2_link.STL</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <diffuse>1 1 1 1</diffuse>
+          <ambient>1 1 1 1</ambient>
+        </material>
+      </visual>
+    </link>
+    <joint name='j6' type='revolute'>
+      <pose relative_to='wrist2_link'>0 0 0.10199999999999999 -1.5708 0 0</pose>
+      <parent>wrist2_link</parent>
+      <child>wrist3_link</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-3.0543</lower>
+          <upper>3.0543</upper>
+          <effort>28</effort>
+          <velocity>3.2000000000000002</velocity>
+        </limit>
+        <dynamics>
+          <damping>0</damping>
+          <friction>0</friction>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='wrist3_link'>
+      <pose relative_to='j6'>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>6.7902069626690238e-05 1.244856304916885e-05 0.078686861013388482 0 0 0</pose>
+        <mass>0.59976999999999991</mass>
+        <inertia>
+          <ixx>0.00035347057333313768</ixx>
+          <ixy>-2.1158001997340868e-09</ixy>
+          <ixz>-5.4705069264124088e-08</ixz>
+          <iyy>0.00035458087590565759</iyy>
+          <iyz>1.965892182846642e-07</iyz>
+          <izz>0.00043765032361900739</izz>
+        </inertia>
+      </inertial>
+      <collision name='wrist3_link_collision'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://fairino_description/meshes/fairino3_v6/wrist3_link.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <collision name='wrist3_link_fixed_joint_lump__custom_gripper_base_link_collision_1'>
+        <pose>0 0 0.094 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://fr3_with_custom_gripper_description/meshes/gripper_body.stl</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='wrist3_link_visual'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://fairino_description/meshes/fairino3_v6/wrist3_link.STL</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <diffuse>1 1 1 1</diffuse>
+          <ambient>1 1 1 1</ambient>
+        </material>
+      </visual>
+      <visual name='wrist3_link_fixed_joint_lump__custom_gripper_base_link_visual_1'>
+        <pose>0 0 0.094 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://fr3_with_custom_gripper_description/meshes/gripper_body.stl</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <diffuse>0.299999982 0.324999988 0.37500003 1</diffuse>
+          <ambient>0.299999982 0.324999988 0.37500003 1</ambient>
+        </material>
+      </visual>
+    </link>
+    <joint name='custom_gripper_actuation_joint' type='revolute'>
+      <pose relative_to='wrist3_link'>0 0 0.094 0 0 0</pose>
+      <parent>wrist3_link</parent>
+      <child>custom_gripper_command_link</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-2.6000000000000001</lower>
+          <upper>0.90000000000000002</upper>
+          <effort>5</effort>
+          <velocity>2</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='custom_gripper_command_link'>
+      <pose relative_to='custom_gripper_actuation_joint'>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>0 0 0 0 0 0</pose>
+        <mass>0.01</mass>
+        <inertia>
+          <ixx>9.9999999999999995e-07</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>9.9999999999999995e-07</iyy>
+          <iyz>0</iyz>
+          <izz>9.9999999999999995e-07</izz>
+        </inertia>
+      </inertial>
+    </link>
+    <joint name='custom_gripper_finger_1_joint_1' type='revolute'>
+      <pose relative_to='wrist3_link'>-0.044999565999999998 0 0.20854165699999999 1.5707963270000003 0 0</pose>
+      <parent>wrist3_link</parent>
+      <child>custom_gripper_finger_1_link_1</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <mimic joint='custom_gripper_actuation_joint'>
+          <multiplier>-0.47368421100000002</multiplier>
+          <offset>-0.47368421100000002</offset>
+          <reference>0</reference>
+        </mimic>
+        <limit>
+          <lower>-0.90000000000000002</lower>
+          <upper>2.6000000000000001</upper>
+          <effort>5</effort>
+          <velocity>2</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='custom_gripper_finger_1_link_1'>
+      <pose relative_to='custom_gripper_finger_1_joint_1'>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>0 0 0 0 0 0</pose>
+        <mass>0.050000000000000003</mass>
+        <inertia>
+          <ixx>1.0000000000000001e-05</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>1.0000000000000001e-05</iyy>
+          <iyz>0</iyz>
+          <izz>1.0000000000000001e-05</izz>
+        </inertia>
+      </inertial>
+      <collision name='custom_gripper_finger_1_link_1_collision'>
+        <pose>-0.090512882000000003 -0.075082267999999994 -0.16494210000000001 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://fr3_with_custom_gripper_description/meshes/phalanx_1.stl</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='custom_gripper_finger_1_link_1_visual'>
+        <pose>-0.090512882000000003 -0.075082267999999994 -0.16494210000000001 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://fr3_with_custom_gripper_description/meshes/phalanx_1.stl</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <diffuse>1 0.524999976 0.099999994 1</diffuse>
+          <ambient>1 0.524999976 0.099999994 1</ambient>
+        </material>
+      </visual>
+    </link>
+    <joint name='custom_gripper_finger_1_joint_2' type='revolute'>
+      <pose relative_to='custom_gripper_finger_1_link_1'>-0.040594141 0.054545200000000002 0 0 0 0</pose>
+      <parent>custom_gripper_finger_1_link_1</parent>
+      <child>custom_gripper_finger_1_link_2</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-1.5</lower>
+          <upper>0</upper>
+          <effort>5</effort>
+          <velocity>2</velocity>
+        </limit>
+        <dynamics>
+          <damping>0.080000000000000002</damping>
+          <friction>0.02</friction>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='custom_gripper_finger_1_link_2'>
+      <pose relative_to='custom_gripper_finger_1_joint_2'>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>0 0 0 0 0 0</pose>
+        <mass>0.050000000000000003</mass>
+        <inertia>
+          <ixx>1.0000000000000001e-05</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>1.0000000000000001e-05</iyy>
+          <iyz>0</iyz>
+          <izz>1.0000000000000001e-05</izz>
+        </inertia>
+      </inertial>
+      <collision name='custom_gripper_finger_1_link_2_collision'>
+        <pose>-0.049918741000000003 -0.12962747099999999 -0.16494210000000001 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://fr3_with_custom_gripper_description/meshes/phalanx_2.stl</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='custom_gripper_finger_1_link_2_visual'>
+        <pose>-0.049918741000000003 -0.12962747099999999 -0.16494210000000001 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://fr3_with_custom_gripper_description/meshes/phalanx_2.stl</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <diffuse>1 0.524999976 0.099999994 1</diffuse>
+          <ambient>1 0.524999976 0.099999994 1</ambient>
+        </material>
+      </visual>
+    </link>
+    <joint name='custom_gripper_finger_2_joint_1' type='revolute'>
+      <pose relative_to='wrist3_link'>0.022499782999999999 -0.038971143 0.20854165699999999 1.5707963270000003 0 2.0943951020000005</pose>
+      <parent>wrist3_link</parent>
+      <child>custom_gripper_finger_2_link_1</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <mimic joint='custom_gripper_actuation_joint'>
+          <multiplier>-0.47368421100000002</multiplier>
+          <offset>-0.47368421100000002</offset>
+          <reference>0</reference>
+        </mimic>
+        <limit>
+          <lower>-0.90000000000000002</lower>
+          <upper>2.6000000000000001</upper>
+          <effort>5</effort>
+          <velocity>2</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='custom_gripper_finger_2_link_1'>
+      <pose relative_to='custom_gripper_finger_2_joint_1'>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>0 0 0 0 0 0</pose>
+        <mass>0.050000000000000003</mass>
+        <inertia>
+          <ixx>1.0000000000000001e-05</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>1.0000000000000001e-05</iyy>
+          <iyz>0</iyz>
+          <izz>1.0000000000000001e-05</izz>
+        </inertia>
+      </inertial>
+      <collision name='custom_gripper_finger_2_link_1_collision'>
+        <pose>-0.090512882000000003 -0.075082267999999994 -0.16494210000000001 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://fr3_with_custom_gripper_description/meshes/phalanx_1.stl</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='custom_gripper_finger_2_link_1_visual'>
+        <pose>-0.090512882000000003 -0.075082267999999994 -0.16494210000000001 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://fr3_with_custom_gripper_description/meshes/phalanx_1.stl</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <diffuse>1 0.524999976 0.099999994 1</diffuse>
+          <ambient>1 0.524999976 0.099999994 1</ambient>
+        </material>
+      </visual>
+    </link>
+    <joint name='custom_gripper_finger_2_joint_2' type='revolute'>
+      <pose relative_to='custom_gripper_finger_2_link_1'>-0.040594141 0.054545200000000002 0 0 0 0</pose>
+      <parent>custom_gripper_finger_2_link_1</parent>
+      <child>custom_gripper_finger_2_link_2</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-1.5</lower>
+          <upper>0</upper>
+          <effort>5</effort>
+          <velocity>2</velocity>
+        </limit>
+        <dynamics>
+          <damping>0.080000000000000002</damping>
+          <friction>0.02</friction>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='custom_gripper_finger_2_link_2'>
+      <pose relative_to='custom_gripper_finger_2_joint_2'>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>0 0 0 0 0 0</pose>
+        <mass>0.050000000000000003</mass>
+        <inertia>
+          <ixx>1.0000000000000001e-05</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>1.0000000000000001e-05</iyy>
+          <iyz>0</iyz>
+          <izz>1.0000000000000001e-05</izz>
+        </inertia>
+      </inertial>
+      <collision name='custom_gripper_finger_2_link_2_collision'>
+        <pose>-0.049918741000000003 -0.12962747099999999 -0.16494210000000001 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://fr3_with_custom_gripper_description/meshes/phalanx_2.stl</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='custom_gripper_finger_2_link_2_visual'>
+        <pose>-0.049918741000000003 -0.12962747099999999 -0.16494210000000001 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://fr3_with_custom_gripper_description/meshes/phalanx_2.stl</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <diffuse>1 0.524999976 0.099999994 1</diffuse>
+          <ambient>1 0.524999976 0.099999994 1</ambient>
+        </material>
+      </visual>
+    </link>
+    <joint name='custom_gripper_finger_3_joint_1' type='revolute'>
+      <pose relative_to='wrist3_link'>0.022499782999999999 0.038971143 0.20854165699999999 1.5707963270000003 0 -2.0943951020000005</pose>
+      <parent>wrist3_link</parent>
+      <child>custom_gripper_finger_3_link_1</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <mimic joint='custom_gripper_actuation_joint'>
+          <multiplier>-0.47368421100000002</multiplier>
+          <offset>-0.47368421100000002</offset>
+          <reference>0</reference>
+        </mimic>
+        <limit>
+          <lower>-0.90000000000000002</lower>
+          <upper>2.6000000000000001</upper>
+          <effort>5</effort>
+          <velocity>2</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='custom_gripper_finger_3_link_1'>
+      <pose relative_to='custom_gripper_finger_3_joint_1'>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>0 0 0 0 0 0</pose>
+        <mass>0.050000000000000003</mass>
+        <inertia>
+          <ixx>1.0000000000000001e-05</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>1.0000000000000001e-05</iyy>
+          <iyz>0</iyz>
+          <izz>1.0000000000000001e-05</izz>
+        </inertia>
+      </inertial>
+      <collision name='custom_gripper_finger_3_link_1_collision'>
+        <pose>-0.090512882000000003 -0.075082267999999994 -0.16494210000000001 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://fr3_with_custom_gripper_description/meshes/phalanx_1.stl</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='custom_gripper_finger_3_link_1_visual'>
+        <pose>-0.090512882000000003 -0.075082267999999994 -0.16494210000000001 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://fr3_with_custom_gripper_description/meshes/phalanx_1.stl</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <diffuse>1 0.524999976 0.099999994 1</diffuse>
+          <ambient>1 0.524999976 0.099999994 1</ambient>
+        </material>
+      </visual>
+    </link>
+    <joint name='custom_gripper_finger_3_joint_2' type='revolute'>
+      <pose relative_to='custom_gripper_finger_3_link_1'>-0.040594141 0.054545200000000002 0 0 0 0</pose>
+      <parent>custom_gripper_finger_3_link_1</parent>
+      <child>custom_gripper_finger_3_link_2</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-1.5</lower>
+          <upper>0</upper>
+          <effort>5</effort>
+          <velocity>2</velocity>
+        </limit>
+        <dynamics>
+          <damping>0.080000000000000002</damping>
+          <friction>0.02</friction>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='custom_gripper_finger_3_link_2'>
+      <pose relative_to='custom_gripper_finger_3_joint_2'>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>0 0 0 0 0 0</pose>
+        <mass>0.050000000000000003</mass>
+        <inertia>
+          <ixx>1.0000000000000001e-05</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>1.0000000000000001e-05</iyy>
+          <iyz>0</iyz>
+          <izz>1.0000000000000001e-05</izz>
+        </inertia>
+      </inertial>
+      <collision name='custom_gripper_finger_3_link_2_collision'>
+        <pose>-0.049918741000000003 -0.12962747099999999 -0.16494210000000001 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://fr3_with_custom_gripper_description/meshes/phalanx_2.stl</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='custom_gripper_finger_3_link_2_visual'>
+        <pose>-0.049918741000000003 -0.12962747099999999 -0.16494210000000001 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.001 0.001 0.001</scale>
+            <uri>model://fr3_with_custom_gripper_description/meshes/phalanx_2.stl</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <diffuse>1 0.524999976 0.099999994 1</diffuse>
+          <ambient>1 0.524999976 0.099999994 1</ambient>
+        </material>
+      </visual>
+    </link>
+    <frame name='custom_gripper_body_to_tcp' attached_to='custom_gripper_body_link'>
+      <pose>0 0 0.17999999999999999 0 0 0</pose>
+    </frame>
+    <frame name='custom_gripper_tcp' attached_to='custom_gripper_body_to_tcp'>
+      <pose>0 0 0 0 0 0</pose>
+    </frame>
+    <frame name='custom_gripper_base_to_body' attached_to='custom_gripper_base_link'>
+      <pose>0 0 0 0 0 0</pose>
+    </frame>
+    <frame name='custom_gripper_body_link' attached_to='custom_gripper_base_to_body'>
+      <pose>0 0 0 0 0 0</pose>
+    </frame>
+    <frame name='wrist3_to_custom_gripper' attached_to='wrist3_link'>
+      <pose>0 0 0.094 0 0 0</pose>
+    </frame>
+    <frame name='custom_gripper_base_link' attached_to='wrist3_to_custom_gripper'>
+      <pose>0 0 0 0 0 0</pose>
+    </frame>
+  </model>
+</sdf>

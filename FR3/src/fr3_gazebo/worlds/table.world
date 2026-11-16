@@ -1,0 +1,14 @@
+<sdf version="1.8">
+  <world name="fr3_table_world">
+
+    <include>
+      <uri>model://table</uri>
+    </include>
+
+    <include>
+      <uri>model://fr3_robot</uri>
+      <pose>0.2 0.1 1.0 0 0 0</pose>
+    </include>
+
+  </world>
+</sdf>

@@ -1,0 +1,6 @@
+t,status
+6.544,"command: 'gắp cái chuột'"
+6.545,"moving to the observe pose and refreshing perception ..."
+20.622,"'gắp cái chuột' -> #3 = obj_4 (white box): gắp cái chuột translates to pick the mouse, which corresponds to the white computer mouse labeled with number 3."
+21.137,"picking obj_4 ..."
+101.740,"pick done: TASK_EXECUTION_SUCCESS: planned pick-and-carry trajectory completed"

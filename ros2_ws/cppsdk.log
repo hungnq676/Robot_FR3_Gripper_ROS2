@@ -1,0 +1,18 @@
+[ERROR] [2026-03-27 14:45:52 pid:20778] (352 RecvPkg) error SDK version
+[ERROR] [2026-03-27 14:45:54 pid:20780] (352 RecvPkg) error SDK version
+[ERROR] [2026-03-27 14:45:56 pid:20782] (352 RecvPkg) error SDK version
+[ERROR] [2026-03-27 14:45:58 pid:20786] (352 RecvPkg) error SDK version
+[ERROR] [2026-03-27 14:45:59 pid:20787] (74 Connect) connect fail, Operation now in progress.
+[ERROR] [2026-03-27 14:45:59 pid:20787] (149 RobotInstCmdSendRoutineThread) RobotInstCmdSendRoutineThread connect fail
+[ERROR] [2026-03-27 14:46:00 pid:20790] (352 RecvPkg) error SDK version
+[ERROR] [2026-03-27 14:46:01 pid:20791] (74 Connect) connect fail, Operation now in progress.
+[ERROR] [2026-03-27 14:46:01 pid:20791] (149 RobotInstCmdSendRoutineThread) RobotInstCmdSendRoutineThread connect fail
+[ERROR] [2026-03-27 14:50:23 pid:22189] (352 RecvPkg) error SDK version
+[ERROR] [2026-03-27 14:50:25 pid:22192] (352 RecvPkg) error SDK version
+[ERROR] [2026-03-27 14:50:27 pid:22196] (352 RecvPkg) error SDK version
+[ERROR] [2026-03-27 14:50:29 pid:22201] (352 RecvPkg) error SDK version
+[ERROR] [2026-03-27 14:50:30 pid:22202] (74 Connect) connect fail, Operation now in progress.
+[ERROR] [2026-03-27 14:50:30 pid:22202] (149 RobotInstCmdSendRoutineThread) RobotInstCmdSendRoutineThread connect fail
+[ERROR] [2026-03-27 14:50:31 pid:22205] (352 RecvPkg) error SDK version
+[ERROR] [2026-03-27 14:50:32 pid:22206] (74 Connect) connect fail, Operation now in progress.
+[ERROR] [2026-03-27 14:50:32 pid:22206] (149 RobotInstCmdSendRoutineThread) RobotInstCmdSendRoutineThread connect fail

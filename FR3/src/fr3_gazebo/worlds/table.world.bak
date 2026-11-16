@@ -1,0 +1,9 @@
+<sdf version="1.8">
+  <world name="default">
+
+    <include>
+      <uri>model://table</uri>
+    </include>
+
+  </world>
+</sdf>

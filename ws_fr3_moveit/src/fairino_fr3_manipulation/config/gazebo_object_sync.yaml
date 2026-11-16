@@ -1,0 +1,35 @@
+gazebo_object_sync:
+  ros__parameters:
+    # Only the table is pre-configured; objects come from tabletop_perception.
+    # true = also copy demo_box's pose straight from Gazebo (debugging only).
+    sync_gazebo_object: false
+    object_id: demo_box
+    planning_frame: base_footprint
+    world_frame: world
+    dimensions: [0.04, 0.04, 0.10]
+    expected_world_center_z: 1.05
+    table_height_tolerance: 0.01
+    position_update_threshold: 0.001
+    orientation_update_threshold: 0.01
+
+    # Thin collision slab immediately below the real tabletop. Its top is
+    # world z=0.995, leaving 5 mm clearance for the robot mounting contact.
+    table.id: work_table
+    table.world_position: [1.06, 0.64, 0.975]
+    table.dimensions: [1.00, 0.50, 0.05]
+
+
+    # Virtual fences (planning only, not in Gazebo): vertical walls 20 cm outside
+    # two table edges - the long edge on the camera side (y = 0.89) and the short
+    # edge behind the robot (x = 1.56) - so the arm keeps working room past the
+    # edges but never swings far out. 2 cm thick, 1 m tall from the tabletop.
+    obstacle_names: [fence_long_camera_side, fence_short_back]
+    obstacles:
+      fence_long_camera_side:   # inner face at y = 1.09
+        shape: box
+        dimensions: [1.32, 0.02, 1.0]
+        world_position: [1.13, 1.10, 1.50]
+      fence_short_back:         # inner face at x = 1.76
+        shape: box
+        dimensions: [0.02, 0.82, 1.0]
+        world_position: [1.77, 0.70, 1.50]

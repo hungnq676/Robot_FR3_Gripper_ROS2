@@ -1,0 +1,130 @@
+diff --git a/fairino_hardware/include/fairino_hardware/fairino_hardware_interface.hpp b/fairino_hardware/include/fairino_hardware/fairino_hardware_interface.hpp
+index cd06d65..48696f9 100644
+--- a/fairino_hardware/include/fairino_hardware/fairino_hardware_interface.hpp
++++ b/fairino_hardware/include/fairino_hardware/fairino_hardware_interface.hpp
+@@ -59,6 +59,16 @@ private:
+   double _jnt_position_state[6];
+   double _jnt_velocity_state[6];
+   double _jnt_torque_state[6];
++  // ServoJ khong co loc (filterT "暂不开放"), nen lenh duoc gioi han gia toc o day:
++  // khi controller huy quy dao va giu tai vi tri do duoc, lenh giam toc thay vi nhay.
++  double _servo_cmd[6];
++  double _servo_vel[6];
++  double _servo_target_prev[6];
++  bool _servo_init = false;
++  bool _servo_filter = true;
++  int _servo_err_count = 0;
++  int _state_poll_count = 0;
++  std::string _last_state_text;
+   int _control_mode;
+   std::string _controller_ip = CONTROLLER_IP_ADDRESS;
+   std::unique_ptr<FRRobot> _ptr_robot;
+diff --git a/fairino_hardware/src/fairino_hardware_interface.cpp b/fairino_hardware/src/fairino_hardware_interface.cpp
+index ca2d84f..573d277 100644
+--- a/fairino_hardware/src/fairino_hardware_interface.cpp
++++ b/fairino_hardware/src/fairino_hardware_interface.cpp
+@@ -1,4 +1,8 @@
+ #include "fairino_hardware/fairino_hardware_interface.hpp"
++#include <algorithm>
++#include <cmath>
++#include <cstdlib>
++#include <string>
+ 
+ namespace fairino_hardware{
+ 
+@@ -116,6 +120,12 @@ hardware_interface::CallbackReturn FairinoHardwareInterface::on_activate(const r
+         _jnt_velocity_state[i] = 0;
+         _jnt_torque_state[i] = 0;
+     }
++    _servo_init = false;//首次write时从指令位置初始化加速度限制器
++    {
++        const char* f = std::getenv("FR3_SERVO_FILTER");
++        _servo_filter = !(f && std::string(f) == "0");
++        RCLCPP_INFO(rclcpp::get_logger("FairinoHardwareInterface"), "Bo loc lenh ServoJ: %s", _servo_filter ? "BAT" : "TAT (lenh goc)");
++    }
+     _control_mode = 0;//默认是位置控制,0-位置控制，1-扭矩控制 2-速度控制
+     errno_t returncode = _ptr_robot->RPC(_controller_ip.c_str());//建立xmlrpc连接
+     rclcpp::sleep_for(200ms);//等待一段时间让控制器的rpc连接建立完毕
+@@ -172,6 +182,22 @@ hardware_interface::return_type FairinoHardwareInterface::read(const rclcpp::Tim
+     }else{
+         hardware_interface::return_type::ERROR;
+     }
++    // Moi giay doc trang thai bo dieu khien (chi doc), in ra khi thay doi:
++    // robot khong chay theo lenh thi nguyen nhan thuong nam o day (che do tay, chua enable, loi).
++    if(_state_poll_count++ % 125 == 0){
++        ROBOT_STATE_PKG pkg{};
++        if(_ptr_robot->GetRobotRealTimeState(&pkg) == 0){
++            char buf[256];
++            snprintf(buf, sizeof(buf),
++                "che do=%s, trang thai=%d (1 dung/2 chay/3 tam dung/4 keo tay), enable=%d, loi=%d/%d, dung khan cap=%d, safety_stop=%d/%d",
++                pkg.robot_mode == 0 ? "TU DONG" : "TAY", pkg.robot_state, pkg.rbtEnableState,
++                pkg.main_code, pkg.sub_code, pkg.EmergencyStop, pkg.safety_stop0_state, pkg.safety_stop1_state);
++            if(_last_state_text != buf){
++                _last_state_text = buf;
++                RCLCPP_INFO(rclcpp::get_logger("FairinoHardwareInterface"), "Robot: %s", buf);
++            }
++        }
++    }
+     //RCLCPP_INFO(rclcpp::get_logger("FairinoHardwareInterface"), "System successfully read: %f,%f,%f,%f,%f,%f",_jnt_position_state[0],\
+     _jnt_position_state[1],_jnt_position_state[2],_jnt_position_state[3],_jnt_position_state[4],_jnt_position_state[5]);
+ 
+@@ -186,16 +212,57 @@ hardware_interface::return_type FairinoHardwareInterface::write(const rclcpp::Ti
+             [](double c) { return not std::isfinite(c); })) {
+             return hardware_interface::return_type::ERROR;
+         }
++        // Gioi han gia toc lenh ServoJ (rad/s^2). Ke hoach MoveIt dung toi da 1.0 rad/s^2
++        // nen binh thuong bo loc khong cat; chi tac dung khi lenh nhay (huy quy dao).
++        constexpr double kDt = 0.008;      // = cmdT cua ServoJ, update_rate 125 Hz
++        constexpr double kMaxAcc = 5.0;    // mo phong: lech ke hoach <1 deg; huy o 0.16 rad/s troi ~0.1 deg
++        constexpr double kMaxVel = 3.2;    // nhanh hon muc nay la buoc nhay, khong phai chuyen dong
++        constexpr double kGain = 20.0;     // 1/s, keo sai so nho ve 0 (hang so thoi gian 50 ms)
++        // Chan cung toc do lenh moi khop (rad/s), lop an toan cuoi cung: MoveIt robot that
++        // gioi han 0.35 (joint_limits_real.yaml); lenh nhanh hon bi cham lai va controller
++        // se ngat vi lech qua 3 deg, robot khong bao gio chay nhanh hon muc nay.
++        constexpr double kVelCap = 0.5;
++        if(!_servo_init){
++            for(int j=0;j<6;j++){
++                _servo_cmd[j] = _jnt_position_command[j];
++                _servo_vel[j] = 0.0;
++                _servo_target_prev[j] = _jnt_position_command[j];
++            }
++            _servo_init = true;
++        }
+         JointPos cmd;
+         ExaxisPos extcmd{0,0,0,0};
+         for(auto j=0;j<6;j++){
+-            cmd.jPos[j] = _jnt_position_command[j]/M_PI*180; //注意单位转换
++            const double target = _jnt_position_command[j];
++            double v_ref = (target - _servo_target_prev[j])/kDt;
++            _servo_target_prev[j] = target;
++            if(std::abs(v_ref) > kMaxVel){
++                v_ref = 0.0;
++            }
++            // Van toc keo ve muc tieu: tuyen tinh khi gan, duong cong phanh sqrt(2*a*e) khi xa
++            const double e = target - _servo_cmd[j];
++            const double v_corr = std::copysign(std::min(std::sqrt(2.0*kMaxAcc*std::abs(e)), kGain*std::abs(e)), e);
++            const double dv = std::clamp(v_ref + v_corr - _servo_vel[j], -kMaxAcc*kDt, kMaxAcc*kDt);
++            _servo_vel[j] = std::clamp(_servo_vel[j] + dv, -kVelCap, kVelCap);
++            _servo_cmd[j] += _servo_vel[j]*kDt;
++            // FR3_SERVO_FILTER=0: gui lenh goc nhu ban driver cua hang (de so sanh A/B)
++            cmd.jPos[j] = (_servo_filter ? _servo_cmd[j] : target)/M_PI*180; //注意单位转换
+         }
+         //RCLCPP_INFO(rclcpp::get_logger("FairinoHardwareInterface"), "ServoJ下发位置:%f,%f,%f,%f,%f,%f",\
+             cmd.jPos[0],cmd.jPos[1],cmd.jPos[2],cmd.jPos[3],cmd.jPos[4],cmd.jPos[5]);
+         int returncode = _ptr_robot->ServoJ(&cmd,&extcmd,0,0,0.008,0,0);
+         if(returncode != 0){
+-            RCLCPP_INFO(rclcpp::get_logger("FairinoHardwareInterface"), "ServoJ指令下发错误,错误码:%d",returncode);
++            // Robot khong theo lenh (loi/dung an toan): dat lai bo loc ve vi tri thuc
++            // de khi robot chay lai, lenh khong bat dau tu mot diem da troi xa.
++            for(int j=0;j<6;j++){
++                _servo_cmd[j] = _jnt_position_state[j];
++                _servo_vel[j] = 0.0;
++            }
++            if(_servo_err_count++ % 125 == 0){//moi giay in 1 lan thay vi 125 lan
++                RCLCPP_INFO(rclcpp::get_logger("FairinoHardwareInterface"), "ServoJ指令下发错误,错误码:%d (lan %d)",returncode,_servo_err_count);
++            }
++        }else{
++            _servo_err_count = 0;
+         }
+     }else if(_control_mode == 1){//扭矩控制模式
+         if (std::any_of(&_jnt_torque_command[0], &_jnt_torque_command[5],\

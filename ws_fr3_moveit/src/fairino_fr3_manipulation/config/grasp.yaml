@@ -1,0 +1,24 @@
+grasp_pose_generator:
+  ros__parameters:
+    arm_group: arm
+    tcp_link: grasp_frame
+
+    # Offset of the TCP from the box centre, expressed in base_footprint.
+    # grasp_frame sits only 50 mm below the gripper palm (palm body spans
+    # 0-26.5 mm), so grasping a 100 mm box at its centre drives the box top
+    # into the palm and tips it over. Raising the TCP 35 mm leaves ~8 mm palm
+    # clearance, ~45 mm between fingertips and table, and 55 mm finger contact.
+    grasp.offset: [0.0, 0.0, 0.035]
+
+    # Top-down grasp: TCP local Z points toward the table and TCP local X
+    # (the gripper closing axis) stays horizontal.
+    grasp.orientation: [1.0, 0.0, 0.0, 0.0]
+
+    # Direction travelled from pregrasp to grasp, expressed in the header
+    # frame (base_footprint). Pregrasp = grasp - direction * distance.
+    approach.direction: [0.0, 0.0, -1.0]
+    approach.distance: 0.20
+
+    marker.axis_length: 0.08
+    marker.point_scale: 0.025
+    ik.timeout_seconds: 1.0

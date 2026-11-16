@@ -1,0 +1,12 @@
+initial_positions:
+  # SRDF "home": pose hand-set on the real FR3 (2026-10-28).
+  # The pick demo also observes the table from here (mtc observe.pose: home).
+  j1: -1.2957
+  j2: -1.5756
+  j3: -1.1733
+  j4: -1.6223
+  j5: 1.4359
+  j6: -1.5669
+  # Start 1 mm inside each limit (about 68 mm jaw opening).
+  joint_clamp_1: -0.001
+  joint_clamp_2: 0.001

@@ -1,0 +1,136 @@
+#!/usr/bin/env bash
+# Chạy toàn bộ mô phỏng FR3: Gazebo -> MoveIt+RViz -> mặt bàn -> nhận diện vật (camera) -> MTC pick.
+# MTC lập kế hoạch cả chuỗi gắp trước; chỉ khi cả chuỗi khả thi robot mới chạy.
+# Mỗi bước mở một tab gnome-terminal riêng, chờ bước trước sẵn sàng rồi mới chạy bước sau.
+# Dùng: ./run_all.sh          (chạy tới khi MTC pick sẵn sàng)
+#       ./run_all.sh --pick   (tự gọi luôn service gắp vật)
+#       ./run_all.sh --table  (chỉ robot + bàn + camera: không vật, không tag;
+#                              chạy Gazebo, MoveIt và mặt bàn/tấm chắn rồi dừng)
+#       ./run_all.sh --stop   (tắt hết)
+set -e
+WS="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+export ROS_DOMAIN_ID=34  # mo phong; robot that (run_real.sh) dung 33, khong bao gio trung
+export ROS_LOCALHOST_ONLY=1  # may ROG: khong de mo phong lan sang robot that tren hungros2 (domain 31)
+export GZ_VERSION=harmonic
+export LC_NUMERIC=en_US.UTF-8  # locale vi_VN dung dau phay thap phan, lam RViz/MoveIt doc sai so
+ENV="source /opt/ros/humble/setup.bash; source $WS/install/setup.bash; export ROS_DOMAIN_ID=$ROS_DOMAIN_ID ROS_LOCALHOST_ONLY=1 GZ_VERSION=$GZ_VERSION LC_NUMERIC=en_US.UTF-8; cd $WS"
+
+# Kill only processes of THIS simulation (ROS_DOMAIN_ID in their environment).
+# A plain pkill also killed the real-robot stack (run_real.sh, domain 33):
+# its MoveIt/RViz died and the driver was left orphaned (2026-10-29).
+kill_sim() {
+  local sig=$1; shift
+  for p in $(pgrep -f "$1"); do
+    { tr '\0' '\n' < /proc/$p/environ; } 2>/dev/null | grep -qx "ROS_DOMAIN_ID=$ROS_DOMAIN_ID" && kill $sig $p 2>/dev/null
+  done
+  return 0
+}
+
+stop_all() {
+  kill_sim -TERM "ros2 launch fairino_fr3"
+  pkill -f "gz sim" || true   # only the sim runs Gazebo; its environ is unreadable, so no domain check
+  kill_sim -TERM move_group
+  kill_sim -TERM "lib/rviz2/rviz2"
+  kill_sim -TERM "ros_gz_bridge/parameter_bridge"
+  kill_sim -TERM "robot_state_publisher"
+  kill_sim -TERM "fairino_fr3_manipulation/lib"
+  sleep 2
+  # gz sim server sometimes ignores SIGTERM; a survivor keeps the Gazebo tab
+  # lock, so the next run cannot start Gazebo (no camera -> perception waits).
+  pkill -9 -f "gz sim" || true
+}
+
+if [ "$1" = "--stop" ]; then stop_all; echo "Đã tắt hết."; exit 0; fi
+
+# Không cho hai lần run_all.sh chạy song song.
+exec 9>/tmp/fr3_run_all.lock
+if ! flock -n 9; then echo "run_all.sh đang chạy ở terminal khác."; exit 1; fi
+
+source /opt/ros/humble/setup.bash
+source $WS/install/setup.bash
+
+# Tắt phiên cũ (nếu có) để tránh trùng node
+stop_all
+# Daemon cũ có thể hỏng sau khi tắt node (lỗi "!rclpy.ok()"), làm mọi bước chờ treo.
+ros2 daemon stop >/dev/null 2>&1 || true
+ros2 daemon start >/dev/null 2>&1 || true
+
+LOCK_DIR=/tmp/fr3_run_all_locks
+mkdir -p "$LOCK_DIR"
+
+open_tab() {  # $1 = tiêu đề, $2 = lệnh
+  # gnome-terminal đôi khi mở trùng tab khi máy đang tải nặng; khoá theo tab để
+  # bản trùng tự thoát thay vì chạy node thứ hai điều khiển cùng robot.
+  local lock="$LOCK_DIR/$(echo "$1" | tr -c 'A-Za-z0-9' '_').lock"
+  gnome-terminal --tab --title="$1" -- bash -c "$ENV; echo '== $1 =='; flock -n $lock $2 || echo 'Tab này đã chạy ở nơi khác, bỏ qua bản trùng.'; echo; echo '[Đã thoát] Enter để đóng'; read"
+}
+
+wait_for() {  # $1 = mô tả, $2 = lệnh kiểm tra, $3 = timeout giây
+  echo -n "Chờ $1 "
+  for _ in $(seq 1 "${3:-120}"); do
+    if eval "$2" >/dev/null 2>&1; then echo " OK"; return 0; fi
+    echo -n "."; sleep 1
+  done
+  echo " HẾT GIỜ"; exit 1
+}
+
+TABLE_ONLY=false
+[ "$1" = "--table" ] && TABLE_ONLY=true
+
+echo "[1/6] Gazebo + controllers"
+open_tab "1 Gazebo" "ros2 launch fairino_fr3_gazebo simulation.launch.py table_only:=$TABLE_ONLY"
+wait_for "3 controller active" \
+  '[ "$(timeout 5 ros2 control list_controllers 2>/dev/null | grep -c active)" -ge 3 ]' 180
+
+echo "[2/6] MoveIt + RViz"
+open_tab "2 MoveIt" "ros2 launch fairino_fr3_moveit_config moveit.launch.py"
+wait_for "move_group (/get_planning_scene)" \
+  'timeout 5 ros2 service list | grep -qx /get_planning_scene' 120
+
+echo "[3/6] Mặt bàn + bridge attach Gazebo"
+open_tab "3 Table" "ros2 launch fairino_fr3_manipulation gazebo_object_sync.launch.py"
+wait_for "node gazebo_object_sync" \
+  'timeout 5 ros2 node list | grep -qx /gazebo_object_sync' 60
+
+if [ "$TABLE_ONLY" = true ]; then
+  echo
+  echo "Sẵn sàng (chỉ robot + bàn + camera). Xem trong Gazebo và RViz."
+  exit 0
+fi
+
+echo "[4/6] Nhận diện vật từ camera"
+open_tab "4 Perception" "ros2 launch fairino_fr3_manipulation tabletop_perception.launch.py"
+wait_for "/fr3_demo/perceived_objects có vật" \
+  'timeout 5 ros2 topic echo --once /fr3_demo/perceived_objects | grep -q "^- id:"' 90
+
+echo "[5/6] MTC pick (plan cả chuỗi rồi mới chạy)"
+open_tab "5 MTC" "ros2 launch fairino_fr3_manipulation mtc_pick_task.launch.py"
+wait_for "service /fr3_demo/run_mtc_pick" \
+  'timeout 5 ros2 service list | grep -qx /fr3_demo/run_mtc_pick' 90
+
+echo "[6/6] Gemini: lệnh gắp bằng lời"
+open_tab "6 Gemini" "ros2 launch fairino_fr3_manipulation gemini_target_selector.launch.py"
+wait_for "topic /fr3_demo/pick_command" \
+  'timeout 5 ros2 topic info /fr3_demo/pick_command | grep -q "Subscription count: [1-9]"' 60
+
+echo
+echo "Vật camera nhìn thấy:"
+timeout 5 ros2 topic echo --once /fr3_demo/perceived_objects \
+  | grep -E "^- id:|^  shape:|^  color:|^  graspable:" | paste - - - - \
+  | sed 's/- id: /  /; s/\s*shape: / /; s/\s*color: / /; s/\s*graspable: / graspable=/'
+
+if [ "$1" = "--pick" ]; then
+  echo "Gọi gắp vật (target mặc định trong mtc_pick_task.yaml)..."
+  ros2 service call /fr3_demo/run_mtc_pick std_srvs/srv/Trigger "{}"
+else
+  echo
+  echo "Sẵn sàng. Ra lệnh bằng lời (Gemini chọn vật rồi tự gắp), ví dụ:"
+  echo "  ROS_DOMAIN_ID=34 ROS_LOCALHOST_ONLY=1 ros2 topic pub --once /fr3_demo/pick_command std_msgs/String \"{data: 'gắp cái chuột'}\""
+  echo "  theo dõi: ROS_DOMAIN_ID=34 ROS_LOCALHOST_ONLY=1 ros2 topic echo /fr3_demo/pick_status"
+  echo "Hoặc chọn thẳng (id hoặc màu + hình dạng):"
+  echo "  ROS_DOMAIN_ID=34 ROS_LOCALHOST_ONLY=1 ros2 topic pub -t 3 /fr3_demo/pick_target std_msgs/String \"{data: 'green box'}\""
+  echo "Rồi gắp:"
+  echo "  ROS_DOMAIN_ID=34 ROS_LOCALHOST_ONLY=1 ros2 service call /fr3_demo/run_mtc_pick std_srvs/srv/Trigger \"{}\""
+  echo "Chỉ lập kế hoạch (robot không chạy):"
+  echo "  ROS_DOMAIN_ID=34 ROS_LOCALHOST_ONLY=1 ros2 service call /fr3_demo/plan_pick_task std_srvs/srv/Trigger \"{}\""
+fi

@@ -1,0 +1,8 @@
+{
+  "id": 1,
+  "open_pos": null,
+  "close_pos": null,
+  "move_ms": 800,
+  "joint_open": -0.001,
+  "joint_closed": -0.03
+}

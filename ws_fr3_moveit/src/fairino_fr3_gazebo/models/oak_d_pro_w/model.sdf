@@ -1,0 +1,61 @@
+<?xml version="1.0"?>
+<sdf version="1.9">
+  <!-- Luxonis OAK-D Pro W, modelled from the official datasheet
+       (docs.luxonis.com/hardware/products/OAK-D Pro W):
+         physical colour sensor: IMX378, stock HFOV 95 deg / VFOV 72 deg (4:3).
+       This simulation uses a configured 63 degree lens for tabletop visibility;
+       the generated camera_info reports that simulated intrinsic matrix.
+         stereo  OV9282 x2, baseline 7.5 cm, ideal depth ~0.7-12 m,
+                 min depth ~0.2 m (400P + extended disparity), error <2 % below 3.5 m
+       The depthai-ros driver publishes stereo depth aligned to RGB, which is what a
+       single gz rgbd_camera provides. Link frame = oak-d-base-frame (x forward). -->
+  <model name="oak_d_pro_w">
+    <static>true</static>
+    <link name="oak_link">
+      <visual name="oak_body_visual">
+        <!-- Official mesh, rotated as in depthai_descriptions base_macro
+             (rpy 1.5708 0 1.5708) and centred on the link origin. -->
+        <pose>-0.01156 -0.04851 -0.01476 1.5708 0 1.5708</pose>
+        <geometry>
+          <mesh><uri>model://oak_d_pro_w/meshes/OAK-D-PRO-W.stl</uri></mesh>
+        </geometry>
+        <material>
+          <ambient>0.15 0.15 0.15 1</ambient>
+          <diffuse>0.2 0.2 0.2 1</diffuse>
+        </material>
+      </visual>
+      <sensor name="rgbd" type="rgbd_camera">
+        <always_on>true</always_on>
+        <update_rate>15</update_rate>
+        <topic>/oak</topic>
+        <!-- Images carry the same optical frame name as the real depthai-ros driver. -->
+        <gz_frame_id>oak_rgb_camera_optical_frame</gz_frame_id>
+        <camera>
+          <!-- Simulation overhead lens: 63 degree HFOV, calibrated via camera_info. -->
+          <horizontal_fov>1.10</horizontal_fov>
+          <image>
+            <!-- 4:3 simulated image; FOV is configured above. -->
+            <width>1280</width>
+            <height>960</height>
+            <format>R8G8B8</format>
+          </image>
+          <clip>
+            <near>0.20</near>
+            <far>12.0</far>
+          </clip>
+          <noise>
+            <type>gaussian</type>
+            <mean>0.0</mean>
+            <stddev>0.005</stddev>
+          </noise>
+          <depth_camera>
+            <clip>
+              <near>0.20</near>
+              <far>12.0</far>
+            </clip>
+          </depth_camera>
+        </camera>
+      </sensor>
+    </link>
+  </model>
+</sdf>

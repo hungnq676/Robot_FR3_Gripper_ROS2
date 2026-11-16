@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<sdf version="1.9">
+  <!-- Screwdriver measured on the real table: 290 mm overall (camera estimate).
+       Handle ~100 mm x 30 mm (red), shaft ~190 mm x 6 mm (black). Lying on the
+       table along x, handle toward +x. Origin on the table under the middle. -->
+  <model name="screwdriver">
+    <link name="screwdriver_link">
+      <pose>0 0 0.015 0 0 0</pose>
+      <inertial>
+        <pose>0.06 0 0 0 0 0</pose>
+        <mass>0.08</mass>
+        <inertia><ixx>1.0e-5</ixx><iyy>4.0e-4</iyy><izz>4.0e-4</izz><ixy>0</ixy><ixz>0</ixz><iyz>0</iyz></inertia>
+      </inertial>
+      <visual name="handle">
+        <pose>0.095 0 0 0 1.5707963 0</pose>
+        <geometry><cylinder><radius>0.015</radius><length>0.10</length></cylinder></geometry>
+        <material><ambient>0.6 0.05 0.03 1</ambient><diffuse>0.85 0.08 0.05 1</diffuse></material>
+      </visual>
+      <visual name="shaft">
+        <pose>-0.05 0 -0.011 0 1.5707963 0</pose>
+        <geometry><cylinder><radius>0.003</radius><length>0.19</length></cylinder></geometry>
+        <material><ambient>0.05 0.05 0.05 1</ambient><diffuse>0.1 0.1 0.1 1</diffuse></material>
+      </visual>
+      <!-- Boxes instead of cylinders so it rests on the table without rolling. -->
+      <collision name="handle">
+        <pose>0.095 0 0 0 0 0</pose>
+        <geometry><box><size>0.10 0.028 0.030</size></box></geometry>
+      </collision>
+      <collision name="shaft">
+        <pose>-0.05 0 -0.011 0 0 0</pose>
+        <geometry><box><size>0.19 0.006 0.008</size></box></geometry>
+      </collision>
+    </link>
+  </model>
+</sdf>

@@ -1,0 +1,373 @@
+import serial
+import struct
+import time
+import threading
+
+# =========================================================
+# FAKE ROBOTIQ 2F85
+# tuned for FAIRINO FR3
+# slave ID = 0x09
+# =========================================================
+
+PORT = "/dev/ttyUSB0"
+BAUD = 115200
+
+# =========================================================
+# CRC16 MODBUS
+# =========================================================
+
+def crc16_modbus(data: bytes) -> bytes:
+    crc = 0xFFFF
+    for byte in data:
+        crc ^= byte
+        for _ in range(8):
+            if crc & 0x0001:
+                crc = (crc >> 1) ^ 0xA001
+            else:
+                crc >>= 1
+    return struct.pack("<H", crc)
+
+
+def verify_crc(data: bytes) -> bool:
+    if len(data) < 4:
+        return False
+    return crc16_modbus(data[:-2]) == data[-2:]
+
+
+# =========================================================
+# GRIPPER STATE
+#
+# gACT : 1 = activated
+# gGTO : 1 = go-to requested (set by FR3, NOT by us after activate)
+# gSTA : 0 = reset, 1 = activating, 3 = activation complete
+# gOBJ : 0 = moving, 1 = stopped (open), 2 = stopped (closed), 3 = reached target
+# gFLT : 0 = no fault
+# gPR  : position request (0x00=open, 0xFF=closed)
+# gPO  : position actual
+# gCU  : current
+# =========================================================
+
+gACT = 0
+gGTO = 0
+gSTA = 0
+gOBJ = 0
+gFLT = 0
+gPR  = 0
+gPO  = 0
+gCU  = 0
+
+moving = False
+lock   = threading.Lock()
+
+
+# =========================================================
+# BUILD STATUS BYTE (register 0x07D0, byte 0)
+#
+# bit 0     gACT
+# bit 1     reserved
+# bit 2     reserved
+# bit 3     gGTO
+# bit 4-5   gSTA
+# bit 6-7   gOBJ
+# =========================================================
+
+def build_status() -> int:
+    val  = (gACT & 0x01)
+    val |= (gGTO & 0x01) << 3
+    val |= (gSTA & 0x03) << 4
+    val |= (gOBJ & 0x03) << 6
+    return val & 0xFF
+
+
+# =========================================================
+# READ REGISTERS
+#
+# FR3 polls 3 registers in rotation:
+#   0x07D0  n=1  →  status byte + reserved
+#   0x07D1  n=1  →  fault byte  + reserved
+#   0x07D2  n=1  →  position    + current
+# =========================================================
+
+def get_register_data(reg: int, nreg: int) -> bytes:
+
+    if reg == 0x07D0:
+        status = build_status()
+        print(f"    STATUS = 0x{status:02X}  "
+              f"(gACT={gACT} gGTO={gGTO} gSTA={gSTA} gOBJ={gOBJ})")
+        return bytes([status, 0x00])
+
+    if reg == 0x07D1:
+        return bytes([gFLT, 0x00])
+
+    if reg == 0x07D2:
+        return bytes([gPO, gCU])
+
+    # unknown register — return zeros
+    return bytes(nreg * 2)
+
+
+# =========================================================
+# ACTIVATION SEQUENCE  (runs in background thread)
+#
+# KEY POINT:
+#   gGTO must stay 0 after activation.
+#   FR3 expects to see gACT=1, gGTO=0, gSTA=3.
+#   Only then it sends WRITE with rGTO=1 itself.
+#   If we set gGTO=1 here, FR3 gets confused and polls forever.
+# =========================================================
+
+def activation_sequence():
+    global gACT, gGTO, gSTA, gOBJ, gFLT, gPO, gCU
+
+    print("\n>>> ACTIVATION START")
+
+    # step 1: mark as activating
+    with lock:
+        gACT = 1
+        gGTO = 0    # must be 0 during and after activation
+        gSTA = 1    # 1 = activation in progress
+        gOBJ = 0
+        gFLT = 0
+
+    time.sleep(0.5)
+
+    # step 2: activation complete
+    with lock:
+        gACT = 1
+        gGTO = 0    # KEEP 0 — FR3 will set this via WRITE rGTO=1
+        gSTA = 3    # 3 = activation complete
+        gOBJ = 0
+        gFLT = 0
+        gPO  = 0x00
+        gCU  = 0
+
+    # at this point build_status() returns 0x31
+    # FR3 reads 0x31, recognises activation done,
+    # then sends WRITE reg=0x03E8 with rACT=1 rGTO=1
+    print(">>> ACTIVATION DONE  (status=0x31 → FR3 will now send WRITE)")
+
+
+# =========================================================
+# MOTION SIMULATION  (runs in background thread)
+# =========================================================
+
+def simulate_motion(target: int):
+    global gPO, gOBJ, moving
+
+    with lock:
+        moving = True
+        gOBJ   = 0      # 0 = in motion
+
+    print(f"\n>>> MOVING  target={target}  from={gPO}")
+
+    step = 1 if target > gPO else -1
+
+    while True:
+        with lock:
+            if gPO == target:
+                break
+            gPO += step
+        time.sleep(0.003)
+
+    with lock:
+        gPO    = target
+        gOBJ   = 3      # 3 = reached target
+        moving = False
+
+    print(f">>> MOVE DONE  pos={gPO}")
+
+
+# =========================================================
+# HANDLE WRITE  (reg 0x03E8 — action request)
+#
+# payload layout (FC16, byte offsets):
+#   [0]  ctrl byte   bit0=rACT  bit3=rGTO
+#   [1]  position request  (0x00 open … 0xFF closed)
+#   [2]  speed
+#   [3]  force
+# =========================================================
+
+def handle_write(reg: int, payload: bytes):
+    global gACT, gGTO, gSTA, gOBJ, gFLT, gPR, gPO
+
+    if reg != 0x03E8:
+        return
+
+    if len(payload) < 1:
+        return
+
+    ctrl = payload[0]
+    rACT = (ctrl     ) & 0x01
+    rGTO = (ctrl >> 3) & 0x01
+
+    print(f"    rACT={rACT}  rGTO={rGTO}")
+
+    # --------------------------------------------------
+    # RESET
+    # --------------------------------------------------
+    if rACT == 0:
+        print("    >>> RESET")
+        with lock:
+            gACT = 0
+            gGTO = 0
+            gSTA = 0
+            gOBJ = 0
+            gFLT = 0
+            gPO  = 0
+            gPR  = 0
+        return
+
+    # --------------------------------------------------
+    # ACTIVATE  (rACT=1 while gACT is still 0)
+    # --------------------------------------------------
+    if rACT == 1 and gACT == 0:
+        print("    >>> ACTIVATE")
+        threading.Thread(target=activation_sequence, daemon=True).start()
+        return
+
+    # --------------------------------------------------
+    # MOVE  (rACT=1, rGTO=1, gripper already activated)
+    # --------------------------------------------------
+    if rACT == 1 and rGTO == 1 and gACT == 1 and gSTA == 3:
+        if len(payload) < 2:
+            return
+
+        target = payload[1]
+        print(f"    >>> MOVE  target=0x{target:02X} ({target})")
+
+        with lock:
+            gPR  = target
+            gGTO = 1    # now it is safe to set GTO high
+
+        threading.Thread(
+            target=simulate_motion,
+            args=(target,),
+            daemon=True
+        ).start()
+        return
+
+
+# =========================================================
+# MODBUS PACKET PARSER
+# =========================================================
+
+def parse_packet(packet: bytes, ser: serial.Serial):
+    if len(packet) < 4:
+        return
+
+    slave = packet[0]
+    fc    = packet[1]
+
+    # --------------------------------------------------
+    # FC03  Read Holding Registers
+    # --------------------------------------------------
+    if fc == 0x03:
+        if len(packet) != 8 or not verify_crc(packet):
+            print("FC03 bad length or CRC")
+            return
+
+        reg  = (packet[2] << 8) | packet[3]
+        nreg = (packet[4] << 8) | packet[5]
+
+        print(f"[READ ] reg=0x{reg:04X}  n={nreg}")
+
+        data = get_register_data(reg, nreg)
+        body = bytes([slave, 0x03, len(data)]) + data
+        resp = body + crc16_modbus(body)
+
+        time.sleep(0.002)
+        ser.write(resp)
+        print(f"[REPLY] {resp.hex(' ').upper()}")
+        return
+
+    # --------------------------------------------------
+    # FC16  Write Multiple Registers
+    # --------------------------------------------------
+    if fc == 0x10:
+        if len(packet) < 9 or not verify_crc(packet):
+            print("FC16 bad length or CRC")
+            return
+
+        reg        = (packet[2] << 8) | packet[3]
+        nreg       = (packet[4] << 8) | packet[5]
+        byte_count = packet[6]
+        payload    = packet[7:7 + byte_count]
+
+        print(f"[WRITE] reg=0x{reg:04X}  n={nreg}")
+        print(f"        payload: {payload.hex(' ').upper()}")
+
+        handle_write(reg, payload)
+
+        ack_body = bytes([slave, 0x10,
+                          packet[2], packet[3],
+                          packet[4], packet[5]])
+        ack = ack_body + crc16_modbus(ack_body)
+
+        time.sleep(0.002)
+        ser.write(ack)
+        print(f"[REPLY] {ack.hex(' ').upper()}")
+        return
+
+    # --------------------------------------------------
+    # FC06  Write Single Register
+    # --------------------------------------------------
+    if fc == 0x06:
+        if len(packet) != 8 or not verify_crc(packet):
+            print("FC06 bad length or CRC")
+            return
+
+        reg     = (packet[2] << 8) | packet[3]
+        payload = packet[4:6]
+
+        print(f"[WRITE1] reg=0x{reg:04X}")
+        print(f"         payload: {payload.hex(' ').upper()}")
+
+        handle_write(reg, payload)
+
+        # echo back for FC06
+        ser.write(packet)
+        print(f"[REPLY] {packet.hex(' ').upper()}")
+        return
+
+
+# =========================================================
+# MAIN LOOP
+# =========================================================
+
+ser = serial.Serial(
+    port     = PORT,
+    baudrate = BAUD,
+    bytesize = 8,
+    parity   = 'N',
+    stopbits = 1,
+    timeout  = 0.05
+)
+
+print("=" * 60)
+print("FAKE ROBOTIQ 2F85  —  slave ID 0x09")
+print(f"port={PORT}  baud={BAUD}")
+print("=" * 60)
+
+buffer = b''
+
+while True:
+    chunk = ser.read(256)
+    if not chunk:
+        continue
+
+    buffer += chunk
+    print(f"\nRX: {chunk.hex(' ').upper()}")
+
+    # try to extract valid packets from buffer
+    while len(buffer) >= 8:
+        found = False
+        for size in range(8, min(len(buffer), 64) + 1):
+            candidate = buffer[:size]
+            if verify_crc(candidate):
+                parse_packet(candidate, ser)
+                buffer = buffer[size:]
+                found  = True
+                break
+        if not found:
+            buffer = buffer[1:]
+            break

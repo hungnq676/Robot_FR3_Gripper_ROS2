@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<sdf version="1.9">
+  <model name="cardboard_box">
+    <!-- Static support prevents the lightweight placement target from being
+         pushed away while the bottle and gripper make contact. -->
+    <static>true</static>
+    <link name="cardboard_box_link">
+      <visual name="cardboard_visual">
+        <!-- The downloaded Gazebo model uses a COLLADA mesh with a separate
+             diffuse PNG, avoiding GLB metallic/roughness channel errors. -->
+        <pose>0 0 -0.08 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <uri>model://cardboard_box/meshes/cardboard_box.dae</uri>
+            <!-- Source mesh is approximately a 0.397 m cube.  Non-uniform
+                 scale preserves our 0.24 x 0.18 x 0.16 m world footprint. -->
+            <scale>0.6044731 0.4533548 0.4029821</scale>
+          </mesh>
+        </geometry>
+      </visual>
+      <collision name="cardboard_collision">
+        <geometry><box><size>0.24 0.18 0.16</size></box></geometry>
+        <surface>
+          <friction>
+            <ode><mu>0.9</mu><mu2>0.9</mu2></ode>
+            <bullet><friction>0.9</friction><friction2>0.9</friction2></bullet>
+          </friction>
+        </surface>
+      </collision>
+    </link>
+    <plugin filename="gz-sim-pose-publisher-system"
+            name="gz::sim::systems::PosePublisher">
+      <publish_model_pose>true</publish_model_pose>
+      <publish_link_pose>false</publish_link_pose>
+      <publish_collision_pose>false</publish_collision_pose>
+      <publish_visual_pose>false</publish_visual_pose>
+      <publish_nested_model_pose>false</publish_nested_model_pose>
+      <update_frequency>5</update_frequency>
+    </plugin>
+  </model>
+</sdf>

@@ -1,8 +1,16 @@
+# Sinh ra khi build/chạy ROS 2, Python, Node: tạo lại được, không commit
 build/
 install/
 log/
 __pycache__/
 *.pyc
+node_modules/
+venv_oak/
+.cache/
 .vscode/
 .idea/
+
+# Bí mật: không bao giờ commit (khóa Gemini, mật khẩu gripper...)
 .env
+*api_key*
+*password*

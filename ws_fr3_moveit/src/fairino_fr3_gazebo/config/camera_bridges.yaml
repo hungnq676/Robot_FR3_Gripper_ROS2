@@ -1,0 +1,32 @@
+# OAK-D Pro W (rgbd sensor topic /oak). ROS names follow the depthai-ros driver:
+# depth is aligned to RGB, so both camera_info topics carry the RGB intrinsics.
+# Note: the real driver publishes depth as 16UC1 millimetres, Gazebo as 32FC1 metres.
+- ros_topic_name: /oak/rgb/image_raw
+  gz_topic_name: /oak/image
+  ros_type_name: sensor_msgs/msg/Image
+  gz_type_name: gz.msgs.Image
+  direction: GZ_TO_ROS
+
+- ros_topic_name: /oak/rgb/camera_info
+  gz_topic_name: /oak/camera_info
+  ros_type_name: sensor_msgs/msg/CameraInfo
+  gz_type_name: gz.msgs.CameraInfo
+  direction: GZ_TO_ROS
+
+- ros_topic_name: /oak/stereo/image_raw
+  gz_topic_name: /oak/depth_image
+  ros_type_name: sensor_msgs/msg/Image
+  gz_type_name: gz.msgs.Image
+  direction: GZ_TO_ROS
+
+- ros_topic_name: /oak/stereo/camera_info
+  gz_topic_name: /oak/camera_info
+  ros_type_name: sensor_msgs/msg/CameraInfo
+  gz_type_name: gz.msgs.CameraInfo
+  direction: GZ_TO_ROS
+
+- ros_topic_name: /oak/points
+  gz_topic_name: /oak/points
+  ros_type_name: sensor_msgs/msg/PointCloud2
+  gz_type_name: gz.msgs.PointCloudPacked
+  direction: GZ_TO_ROS

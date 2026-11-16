@@ -1,0 +1,31 @@
+pick_and_carry:
+  ros__parameters:
+    arm_group: arm
+    gripper_group: gripper
+    tcp_link: grasp_frame
+    object_id: demo_box
+
+    # End of Step 7. The object remains attached here for the future place step.
+    place.frame: base_footprint
+    place.position: [0.30, 0.25, 0.30]
+    place.orientation: [1.0, 0.0, 0.0, 0.0]
+
+    lift_distance: 0.15
+    cartesian_step: 0.005
+    minimum_cartesian_fraction: 0.95
+    velocity_scaling: 0.12
+    acceleration_scaling: 0.10
+    planning_time: 10.0
+    gazebo_attach_timeout: 5.0
+
+    # Jaw gap = 0.070 - 2*|q| m. 0.0152 gives ~39.6 mm for the 40 mm demo_box:
+    # the jaws just touch it instead of squeezing to the 10 mm "closed" state.
+    gripper_grasp_positions: [-0.0152]  # joint_clamp_1 only; joint_clamp_2 mimics it
+
+    # Only these links may contact demo_box during the final approach.
+    touch_links:
+      - wrist3_link
+      - base_link_gripper
+      - clamp_1
+      - clamp_2
+      - grasp_frame

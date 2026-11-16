@@ -1,0 +1,72 @@
+tabletop_perception:
+  ros__parameters:
+    # Orbbec Astra Pro Plus (ros2_astra_camera, run_astra.sh) since 2026-10-31;
+    # depth registered to colour (depth_registration:=true), 640x480.
+    depth_topic: /camera/depth/image_raw
+    rgb_topic: /camera/color/image_raw
+    camera_info_topic: /camera/color/camera_info
+    world_frame: base_footprint
+
+    # Real cell (2026-10-30). Table top measured by touching: z = +8.7 mm in
+    # base_footprint. The 1.0 x 0.5 m table is turned ~37 deg to the robot
+    # axes; corners from camera rays cut with that plane (+-2 cm).
+    table.top_z: 0.012   # 2026-10-31 from the Astra tag samples (old table touched: 0.0087)
+    table.polygon: [0.088, 0.362, 0.480, 0.060, -0.145, -0.677, -0.540, -0.397]
+    # Corners are only good to +-2 cm, so stay well inside them.
+    table.edge_margin: 0.06
+
+    # The tabletop plane is refitted every frame from points within
+    # plane_search of top_z; heights are measured from that plane.
+    # Residual depth error on the far table is +-1..2.5 cm, so search wider.
+    table.plane_search: 0.04
+
+    # Points kept: 12 mm .. 40 cm above the fitted table (ignores the flat
+    # AprilTag and ~2.5 sigma of depth noise).
+    # Real depth residual is larger than in Gazebo: 2 cm floor.
+    min_height: 0.02
+    max_height: 0.40
+    depth_range: [0.2, 3.0]
+    pixel_stride: 2
+    # Median filter on depth (3 or 5).
+    depth_median_kernel: 5
+    # Disparity bias z_true = 1 / (1/z + k). 0.092 was the OAK's. The Astra's
+    # error is a tilt over the image (tools/depth_plane_fit.py, pixel_ratio
+    # model in ~/.ros/fr3_astra_depth_model.yaml), which this node cannot apply
+    # yet: expect a few cm of height error towards the image sides.
+    depth_bias_k: 0.0
+    voxel_size: 0.005
+    min_cluster_voxels: 40
+    # Convex-hull / bounding-rectangle area: ~1.0 box, ~0.785 cylinder.
+    cylinder_fill_ratio: 0.9
+    # Box footprint from points within this band below the top face.
+    top_face_band: 0.01
+
+    # Robot self-filter: points within this distance of the robot's collision
+    # meshes are dropped, plus a sphere around the TCP for a carried object.
+    # Real depth is off by 1-2 cm near the base, so filter wider.
+    robot_filter_distance: 0.045
+    robot_sample_spacing: 0.01
+    carried_object_radius: 0.09
+    tcp_link: grasp_frame
+
+    # Gripper: jaws open 68 mm; objects need this much spare to be graspable.
+    gripper_max_opening: 0.068
+    grasp_margin: 0.006
+
+    # Tracking and MoveIt scene updates
+    update_rate: 2.0
+    match_distance: 0.04
+    forget_after: 2.0
+    # A new object must be seen in this many consecutive updates.
+    min_confirmations: 3
+    # Perceive only while the robot is still (all |joint velocity| below
+    # max_joint_speed for still_time s); moving arm edges look like objects.
+    max_joint_speed: 0.01
+    still_time: 0.5
+    scene_update_position: 0.005
+    scene_update_yaw: 0.05
+    scene_update_size: 0.006
+    # Added to each side in MoveIt. Camera sizes can be ~15 mm short (tapered
+    # ends of a scanned mouse fall below min_height), so keep the arm 2 cm away.
+    collision_padding: 0.02
+    use_sim_time: false

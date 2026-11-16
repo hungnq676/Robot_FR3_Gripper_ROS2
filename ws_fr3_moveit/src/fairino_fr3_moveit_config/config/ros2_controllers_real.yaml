@@ -1,0 +1,34 @@
+# Real FR3: the FAIRINO driver exports position state only (no velocity).
+controller_manager:
+  ros__parameters:
+    # 125 Hz = the 8 ms ServoJ period the FAIRINO driver sends (cmdT 0.008);
+    # at 100 Hz the arm runs each 8 ms step then idles 2 ms (stutter, lag).
+    update_rate: 125
+    joint_state_broadcaster:
+      type: joint_state_broadcaster/JointStateBroadcaster
+    arm_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+    gripper_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+
+arm_controller:
+  ros__parameters:
+    joints: [j1, j2, j3, j4, j5, j6]
+    command_interfaces: [position]
+    state_interfaces: [position]
+    # Abort (hold position) if the arm lags the plan by more than ~3 deg.
+    constraints:
+      stopped_velocity_tolerance: 0.0
+      goal_time: 2.0
+      j1: {trajectory: 0.05, goal: 0.01}
+      j2: {trajectory: 0.05, goal: 0.01}
+      j3: {trajectory: 0.05, goal: 0.01}
+      j4: {trajectory: 0.05, goal: 0.01}
+      j5: {trajectory: 0.05, goal: 0.01}
+      j6: {trajectory: 0.05, goal: 0.01}
+
+gripper_controller:  # mock until the gripper exists
+  ros__parameters:
+    joints: [joint_clamp_1]
+    command_interfaces: [position]
+    state_interfaces: [position, velocity]

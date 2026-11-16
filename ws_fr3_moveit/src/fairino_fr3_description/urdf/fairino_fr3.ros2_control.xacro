@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <xacro:macro name="fairino_fr3_ros2_control" params="system_name hardware_type initial_positions_file">
+    <xacro:property name="initial_positions" value="${xacro.load_yaml(initial_positions_file)['initial_positions']}"/>
+
+    <xacro:macro name="controlled_joint" params="joint_name velocity:=true">
+      <joint name="${joint_name}">
+        <command_interface name="position"/>
+        <state_interface name="position">
+          <param name="initial_value">${initial_positions[joint_name]}</param>
+        </state_interface>
+        <xacro:if value="${velocity}">
+          <state_interface name="velocity"/>
+        </xacro:if>
+      </joint>
+    </xacro:macro>
+
+    <xacro:macro name="arm_joints" params="velocity">
+      <xacro:controlled_joint joint_name="j1" velocity="${velocity}"/>
+      <xacro:controlled_joint joint_name="j2" velocity="${velocity}"/>
+      <xacro:controlled_joint joint_name="j3" velocity="${velocity}"/>
+      <xacro:controlled_joint joint_name="j4" velocity="${velocity}"/>
+      <xacro:controlled_joint joint_name="j5" velocity="${velocity}"/>
+      <xacro:controlled_joint joint_name="j6" velocity="${velocity}"/>
+    </xacro:macro>
+
+    <!-- Single gripper motor: only joint_clamp_1 is commanded; joint_clamp_2
+         is driven to -joint_clamp_1 (gz_ros2_control / mock mimic support). -->
+    <xacro:macro name="gripper_joints">
+      <xacro:controlled_joint joint_name="joint_clamp_1"/>
+      <joint name="joint_clamp_2">
+        <param name="mimic">joint_clamp_1</param>
+        <param name="multiplier">-1</param>
+        <state_interface name="position">
+          <param name="initial_value">${initial_positions['joint_clamp_2']}</param>
+        </state_interface>
+        <state_interface name="velocity"/>
+      </joint>
+    </xacro:macro>
+
+    <xacro:if value="${hardware_type == 'fairino'}">
+      <!-- Real FR3: frcobot_ros2 driver (ServoJ via the controller at 192.168.58.2).
+           It exports position state only. -->
+      <ros2_control name="${system_name}" type="system">
+        <hardware>
+          <plugin>fairino_hardware/FairinoHardwareInterface</plugin>
+        </hardware>
+        <xacro:arm_joints velocity="false"/>
+      </ros2_control>
+      <!-- Gripper not built yet: simulated so MoveIt still gets its joint states. -->
+      <ros2_control name="${system_name}Gripper" type="system">
+        <hardware>
+          <plugin>mock_components/GenericSystem</plugin>
+        </hardware>
+        <xacro:gripper_joints/>
+      </ros2_control>
+    </xacro:if>
+
+    <xacro:unless value="${hardware_type == 'fairino'}">
+      <ros2_control name="${system_name}" type="system">
+        <hardware>
+          <xacro:if value="${hardware_type == 'mock'}">
+            <plugin>mock_components/GenericSystem</plugin>
+          </xacro:if>
+          <xacro:if value="${hardware_type == 'gz'}">
+            <plugin>gz_ros2_control/GazeboSimSystem</plugin>
+          </xacro:if>
+        </hardware>
+        <xacro:arm_joints velocity="true"/>
+        <xacro:gripper_joints/>
+      </ros2_control>
+    </xacro:unless>
+  </xacro:macro>
+</robot>

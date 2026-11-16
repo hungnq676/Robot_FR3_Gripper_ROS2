@@ -1,0 +1,16 @@
+/oak:
+  ros__parameters:
+    camera:
+      i_nn_type: none        # khong can NN tren camera; bo di de nhe bang thong USB
+      i_pipeline_type: RGBD
+      i_restart_on_diagnostics_error: true  # tu ket noi lai khi cap USB bi rot
+      # Laser dot projector on (2026-10-30): the camera is on USB 3 now; on USB 2
+      # (500 mA) it browned out and reset, so IR was off. The dots give the stereo
+      # depth texture on the plain wooden table. Flood light off (only for mono in the dark).
+      i_enable_ir: true
+      i_laser_dot_brightness: 800
+      i_floodlight_brightness: 0
+    rgb:
+      i_fps: 15.0
+    stereo:
+      i_align_depth: true    # depth canh theo RGB (tabletop_perception can)

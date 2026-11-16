@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="fairino_fr3">
+  <xacro:arg name="hardware_type" default="mock"/>
+  <xacro:arg name="use_gazebo" default="false"/>
+  <xacro:arg name="mount_to_world" default="false"/>
+  <xacro:arg name="mount_xyz" default="1.20 0.72 1.00"/>
+  <xacro:arg name="mount_rpy" default="0 0 -1.57"/>
+  <xacro:arg name="initial_positions_file"
+             default="$(find fairino_fr3_description)/config/initial_positions.yaml"/>
+  <xacro:arg name="controller_config" default=""/>
+  <!-- Gazebo only: graspable-object attach joints and the hand-eye tag on J6. -->
+  <xacro:arg name="sim_objects" default="true"/>
+
+  <xacro:include filename="$(find fairino_fr3_description)/urdf/fairino_fr3_model.xacro"/>
+  <xacro:include filename="$(find fairino_fr3_description)/urdf/fairino_fr3.ros2_control.xacro"/>
+  <xacro:include filename="$(find fairino_fr3_description)/urdf/fairino_fr3.gazebo.xacro"/>
+
+  <!--
+    Simulation fixture.  Enable this only when Gazebo must physically bolt the
+    robot base to the work cell.  For real hardware leave it disabled and
+    publish world -> base_footprint from cell calibration/localization.
+  -->
+  <xacro:if value="$(arg mount_to_world)">
+    <link name="world"/>
+    <joint name="world_to_fr3_mount" type="fixed">
+      <parent link="world"/>
+      <child link="base_footprint"/>
+      <origin xyz="$(arg mount_xyz)" rpy="$(arg mount_rpy)"/>
+    </joint>
+  </xacro:if>
+
+  <xacro:fairino_fr3_ros2_control
+      system_name="FR3System"
+      hardware_type="$(arg hardware_type)"
+      initial_positions_file="$(arg initial_positions_file)"/>
+
+  <xacro:if value="$(arg use_gazebo)">
+    <xacro:fairino_fr3_gazebo controller_config="$(arg controller_config)"
+        sim_objects="$(arg sim_objects)"/>
+  </xacro:if>
+</robot>

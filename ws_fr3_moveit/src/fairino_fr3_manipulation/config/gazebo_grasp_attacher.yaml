@@ -1,0 +1,11 @@
+gazebo_grasp_attacher:
+  ros__parameters:
+    # Gazebo models that can be "grasped" (welded to the wrist). Must match the
+    # fr3_detachable_object entries in fairino_fr3.gazebo.xacro.
+    graspable_models: [demo_box, water_bottle, computer_mouse, pen]
+    tcp_link: grasp_frame
+    world_frame: world
+    # The object welded is the one whose centre is nearest the TCP, if closer
+    # than this.
+    max_distance: 0.08
+    use_sim_time: true
